@@ -1,0 +1,33 @@
+﻿# Local / development files
+Test-Project/
+Backup/
+
+# IDE settings
+.vscode/
+.idea/
+
+# Antigravity/project runtime state
+.agents/
+.agent/
+.gemini/
+.agy-skills.json
+
+# Credentials / secrets
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+*.p12
+credentials.json
+secrets.json
+
+# Logs / temporary files
+*.log
+*.tmp
+*.temp
+Thumbs.db
+.DS_Store
+
+# Archives generated locally
+*.zip
