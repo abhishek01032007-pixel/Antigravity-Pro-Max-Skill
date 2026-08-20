@@ -1,13 +1,11 @@
 <p align="center">
   <br>
-  <img src="https://img.shields.io/badge/ANTIGRAVITY-PRO%20MAX%20SKILL-0B1020?style=for-the-badge&labelColor=9333EA&color=111827" alt="Antigravity Pro Max Skill" />
+  <img src="https://img.shields.io/badge/NEXORA-SKILLS%20MANAGER-0B1020?style=for-the-badge&labelColor=2563EB&color=111827" alt="Nexora Skills Manager" />
 </p>
 
-<h1 align="center">🪐 ANTIGRAVITY PRO MAX SKILL</h1>
+<h1 align="center">⚡ NEXORA SKILLS MANAGER</h1>
 
-<h3 align="center">Professional Skill Packs for Google Antigravity</h3>
-
-
+<h3 align="center">Next-Generation Modular Skill & Agent Orchestration for AI-Assisted Development</h3>
 
 <p align="center">
   <img src="https://img.shields.io/badge/⌘%20FRONTEND-F59E0B?style=for-the-badge&labelColor=FDBA74&color=EA580C" alt="Frontend" />
@@ -18,52 +16,134 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/One%20Setup-374151?style=flat-square" alt="One Setup" />
-  <img src="https://img.shields.io/badge/One%20Command-0F766E?style=flat-square" alt="One Command" />
+  <img src="https://img.shields.io/badge/Command-nexora-0F766E?style=flat-square" alt="Command nexora" />
+  <img src="https://img.shields.io/badge/Legacy%20Support-agpm-6B7280?style=flat-square" alt="Legacy agpm" />
   <img src="https://img.shields.io/badge/Project--Scoped-4B5563?style=flat-square" alt="Project Scoped" />
-  <img src="https://img.shields.io/badge/Skills-2563EB?style=flat-square" alt="Skills" />
-  <img src="https://img.shields.io/badge/Windows-4B5563?style=flat-square" alt="Windows" />
-  <img src="https://img.shields.io/badge/Compatible-DC2626?style=flat-square" alt="Compatible" />
+  <img src="https://img.shields.io/badge/Skills-Modular-2563EB?style=flat-square" alt="Modular Skills" />
+  <img src="https://img.shields.io/badge/Windows-Compatible-059669?style=flat-square" alt="Windows Compatible" />
 </p>
 
 <p align="center">
-  <strong>One setup. One command. Project-scoped skills.</strong>
+  <strong>One setup. Unified CLI. Project-scoped agent intelligence.</strong>
 </p>
 
 <p align="center">
-  A professional Windows skill-pack manager designed to give each
-  Antigravity project the right development skills without replacing
-  Antigravity’s built-in skills.
+  Nexora Skills Manager (formerly <em>Antigravity-Pro-Max-Skill</em>) is a high-performance, project-scoped skill manager for Google Antigravity and modern agentic development environments on Windows. It delivers curated, role-specific engineering skills directly to your project without polluting global environments or overriding built-in agent capabilities.
 </p>
 
 ---
-# 🚀 About Antigravity Pro Max
 
-**Antigravity Pro Max Skill** is a project-scoped skill manager built for Google Antigravity on Windows.
+## 🌟 Product Vision
 
-It organizes development skills into focused packs so you can activate the right environment for the project you are currently working on.
+Modern software engineering with AI agents requires context-aware specialization. Generic prompts fail on complex stacks, while global skill bloat slows agents down and degrades accuracy.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/PROJECT--SCOPED-2563EB?style=for-the-badge" alt="Project Scoped" />
-  <img src="https://img.shields.io/badge/PORTABLE-RUNTIME-7C3AED?style=for-the-badge" alt="Portable Runtime" />
-  <img src="https://img.shields.io/badge/BUILT--IN%20SKILLS-PROTECTED-059669?style=for-the-badge" alt="Built In Skills Protected" />
-</p>
-
-Antigravity Pro Max gives you dedicated modes for:
-
-- 🎨 **Frontend development**
-- ⚙️ **Backend development**
-- 🧪 **QA / Debugging**
-- 🔗 **Full Stack development**
-- 🐍 **Python / FastAPI**
-- 🟩 **Node.js**
-- 📱 **Flutter**
-- 🌐 **Web development**
-- 🔐 **Security and architecture**
-- 🧪 **Testing and validation**
+**Nexora Skills Manager** solves this by introducing dynamic, project-scoped skill injection:
+- **Zero Global Pollution**: Skills attach exclusively to active project workspaces under `.agents/skills`.
+- **Role-Based Modes**: Instantly activate dedicated profiles for Frontend, Backend, QA/Debugging, or Full Stack workflows.
+- **Framework Precision**: Granular framework packs for Flutter, FastAPI, Node.js, and modern cloud architectures.
+- **Safe Lifecycle**: Switch modes cleanly, monitor active skills with health checks, or reset to baseline with zero footprint.
 
 ---
 
-# ⚡ One-Command Setup
+## 🏗 What Nexora Solves
+
+| Challenge | Without Nexora | With Nexora Skills Manager |
+|---|---|---|
+| **Skill Management** | Manual copying of Markdown prompts and fragmented repos | Single CLI command (`nexora`) to manage and activate packs |
+| **Context Pollution** | Hundreds of unneeded skills injected globally into the agent | Strictly scoped to `<project>/.agents/skills` based on active task mode |
+| **Workflow Friction** | Reconfiguring IDEs and agent settings for different projects | Switch modes (Frontend, Backend, QA, Fullstack) in seconds |
+| **Framework Depth** | Surface-level code generation | Deep architectural patterns (CQRS, TDD, Clean Architecture, Security Auditing) |
+
+---
+
+## 🧭 Architecture & How It Works
+
+```text
+                        ┌────────────────────────┐
+                        │     nexora (CLI)       │
+                        │ (agpm legacy fallback) │
+                        └───────────┬────────────┘
+                                    │
+                                    ▼
+                         [Select Target Project]
+                                    │
+                                    ▼
+                         [Select Workspace Mode]
+                                    │
+        ┌───────────────────┼───────────────────┬───────────────────┐
+        │                   │                   │                   │
+        ▼                   ▼                   ▼                   ▼
+  🎨 FRONTEND          ⚙️ BACKEND         🧪 QA / DEBUG       🔗 FULL STACK
+    • Flutter / UI       • API Design        • Unit / Widget     • End-to-End
+    • Web / Mobile       • FastApi / Node    • Static Analysis   • All Skill Packs
+    • Design Systems     • Security / DB     • Code Review       • Architecture
+        │                   │                   │                   │
+        └───────────────────┴───────────────────┴───────────────────┘
+                                    │
+                                    ▼
+                    Target Project Workspace Directory
+                        <project>/.agents/skills/
+                                    │
+                                    ▼
+                      AI Agent Workflows Activated
+```
+
+---
+
+## 📦 Curated Skill Library
+
+Nexora organizes over 50+ specialized engineering skills across dedicated functional domains:
+
+```text
+NEXORA SKILLS MANAGER
+│
+├── 🎨 Frontend-Pro-Max
+│   ├── Flutter, Dart, & Native interop
+│   ├── Mobile & Responsive Web layouts
+│   ├── UI/UX Design Systems & Micro-animations
+│   └── Frontend Performance Optimization
+│
+├── ⚙️ Backend-Pro-Max
+│   ├── API Design (REST, GraphQL, gRPC)
+│   ├── Clean Architecture & Microservices (CQRS, Event Sourcing)
+│   ├── Backend Security & Authentication (OAuth2, OIDC)
+│   ├── Database Workflows & SQL Query Optimization
+│   └── Resilient Error Handling Patterns
+│
+├── 🧪 QA-Debug-Pro-Max
+│   ├── Unit, Widget, and Integration Testing
+│   ├── Runtime Debugging & Crash Diagnostics
+│   ├── Static Analysis & Lint Auto-fixing
+│   ├── Architecture & Security Auditing
+│   └── E2E Testing Patterns
+│
+├── 🔗 Fullstack-Extras
+│   └── Cross-stack feature orchestration & workflow automation
+│
+├── 🧩 Backend-Frameworks
+│   ├── Python (FastAPI, Async Architectures)
+│   └── NodeJS (Modern Backend APIs, Microservices)
+│
+└── 🧭 Loaders
+    └── Dynamic interactive project selection, mode switching, & status reporting
+```
+
+---
+
+## 🤖 Supported AI Platforms
+
+Nexora Skills Manager adheres to standard agent customization formats (`SKILL.md` specifications with YAML frontmatter):
+
+- 🪐 **Google Antigravity (AGY)**: Native support with project-level `.agents/skills` discovery.
+- 💻 **Antigravity IDE & 2.0 Agents**: Seamless hot-reload and task orchestration.
+- ⚡ **Claude Code / Anthropic Agent Ecosystems**: Standard YAML frontmatter compliance.
+- 🛠 **Cursor, Copilot, & Custom Agent Toolchains**: Compatible with workspace-level skill repositories.
+
+---
+
+## ⚡ Installation
+
+### Option 1: One-Command Setup (PowerShell)
 
 Open **Windows PowerShell** and run:
 
@@ -71,561 +151,127 @@ Open **Windows PowerShell** and run:
 irm agpm.dev/install | iex
 ```
 
-<p align="center">
-  <strong>Download → Install → Verify → Ready</strong>
-</p>
+The installer will:
+1. Download and verify the Nexora Skills Manager runtime.
+2. Install all skill packs and loaders to the local runtime path (`C:\Antigravity Pro Max Skill`).
+3. Register the primary **`nexora`** command in your User `PATH`.
+4. Register the backward-compatible **`agpm`** alias.
 
-The setup automatically:
+### Option 2: Manual / Local Installation
 
-```text
-Downloads Antigravity Pro Max
-        ↓
-Verifies the runtime
-        ↓
-Installs required skill packs
-        ↓
-Creates the AGPM launcher
-        ↓
-Registers the agpm command
-        ↓
-Cleans temporary setup files
-        ↓
-Ready
+Clone or download this repository, then run from an elevated PowerShell terminal:
+
+```powershell
+.\install.ps1
 ```
-
-> Installation does not select or modify an Antigravity project.
 
 ---
 
-# 📍 Installation Location
+## 💻 CLI Commands
 
-The default Antigravity Pro Max runtime location is:
+### Primary Command: `nexora`
 
-```text
-C:\Antigravity Pro Max Skill
+Launch the interactive project selector and mode manager:
+
+```powershell
+nexora
 ```
 
-### Runtime structure
+#### Planned CLI Capabilities (Roadmap):
+- `nexora scan` — Inspect the current project and detect missing or unlinked skills.
+- `nexora skills` — List all available skill packs and framework modules.
+- `nexora update` — Check for skill pack and core updates from GitHub.
+- `nexora doctor` — Verify agent runtime environment, paths, and skill validity.
 
-```text
-C:\Antigravity Pro Max Skill
-│
-├── Backend-Frameworks
-├── Backend-Pro-Max
-├── Frontend-Pro-Max
-├── Fullstack-Extras
-├── Loaders
-├── QA-Debug-Pro-Max
-└── Start-Antigravity-Pro-Max.bat
-```
+### Backward Compatibility: `agpm`
 
-The permanent `agpm` launcher is registered for the current Windows user under:
-
-```text
-%LOCALAPPDATA%\AntigravityProMax\bin
-```
-
-No personal Windows username is hardcoded.
-
----
-
-# ▶️ Start Antigravity Pro Max
-
-After installation, run:
+For existing workflows and muscle memory, the `agpm` command is fully preserved:
 
 ```powershell
 agpm
 ```
 
-This opens the Antigravity Pro Max project selector.
-
-<p align="center">
-  <strong>One command to access every Pro Max mode.</strong>
-</p>
+*When executed, `agpm` presents a brief migration notice and seamlessly forwards all arguments to the `nexora` engine.*
 
 ---
 
-# 🧭 How It Works
+## 🧭 Available Modes
 
-```text
-                         agpm
-                           │
-                           ▼
-                 Select Your Project
-                           │
-                           ▼
-                   Select Work Mode
-                           │
-       ┌───────────────────┼───────────────────┬───────────────────┐
-       │                   │                   │                   │
-       ▼                   ▼                   ▼                   ▼
- 🎨 FRONTEND          ⚙️ BACKEND         🧪 QA / DEBUG      🔗 FULL STACK
-   PRO MAX              PRO MAX             PRO MAX             PRO MAX
-       │                   │                   │                   │
-       └───────────────────┴───────────────────┴───────────────────┘
-                                   │
-                                   ▼
-                         Project Skill Folder
-                                   │
-                                   ▼
-                            .agents\skills
-                                   │
-                                   ▼
-                         Continue Development
-```
+When running `nexora`, you can select:
 
-Each mode is a separate selectable environment.
+| Mode | Key Included Skills | Best Used For |
+|---|---|---|
+| **[1] Frontend Pro Max** | Flutter, Mobile, Web, UI/UX, Responsive Design | Mobile apps, web frontends, component design |
+| **[2] Backend Pro Max** | APIs, Clean Architecture, Security, FastAPI/Node | REST/GraphQL backends, microservices, databases |
+| **[3] QA / Debug Pro Max** | Unit tests, Mocking, Diagnostics, Auditing | Bug reproduction, test coverage, code reviews |
+| **[4] Full Stack Pro Max** | All Frontend + Backend + QA + Orchestration | End-to-end full stack product development |
+| **[5] Default Mode** | Cleans all managed skills from project | Returning workspace to default state |
+| **[6] Status** | Diagnostic report on active skills and health | Checking current mode and skill counts |
 
 ---
 
-# 🎨 Frontend Pro Max
+## 🔢 Version System
 
-<p align="center">
-  <img src="https://img.shields.io/badge/FRONTEND-F59E0B?style=for-the-badge" alt="Frontend Pro Max" />
-</p>
+Nexora tracks versioning via dual synchronized manifests:
+- **`nexora-version.json`** *(Primary)*
+- **`agpm-version.json`** *(Compatibility)*
 
-Frontend Pro Max is designed for user-facing application development.
-
-### Focus areas
-
-- Flutter
-- Mobile development
-- Web frontend
-- UI / UX
-- Responsive layouts
-- Routing
-- Localization
-- JSON serialization
-- HTTP integration
-- Frontend architecture
-- Widget development
-- Performance optimization
-
-### Frontend flow
-
-```text
-Frontend Pro Max
-        ↓
-Optional QA / Debug
-        ↓
-Frontend project skills ready
+```json
+{
+  "coreVersion": "1.0.0",
+  "skillPackVersion": "1.0.0"
+}
 ```
 
-Recommended for:
-
-```text
-Flutter Apps
-Mobile Apps
-Web Interfaces
-Dashboards
-Responsive Websites
-UI / UX Work
-```
-
----
-
-# ⚙️ Backend Pro Max
-
-<p align="center">
-  <img src="https://img.shields.io/badge/BACKEND-7C3AED?style=for-the-badge" alt="Backend Pro Max" />
-</p>
-
-Backend Pro Max focuses on APIs, architecture, data, security, and backend workflows.
-
-### Focus areas
-
-- API design
-- Backend architecture
-- Authentication
-- Authorization patterns
-- Backend security
-- SQL optimization
-- Database workflows
-- Error handling
-- Microservices
-- CQRS
-- Event stores
-- Saga orchestration
-- Workflow orchestration
-- API documentation
-
-### Optional framework support
-
-```text
-Generic / None
-Python / FastAPI
-Node.js
-```
-
-### Backend flow
-
-```text
-Backend Pro Max
-        ↓
-Choose Framework
-        ↓
-Optional QA / Debug
-        ↓
-Backend project skills ready
-```
-
----
-
-# 🧪 QA / Debug Pro Max
-
-<p align="center">
-  <img src="https://img.shields.io/badge/QA%20%2F%20DEBUG-059669?style=for-the-badge" alt="QA Debug Pro Max" />
-</p>
-
-QA / Debug Pro Max is dedicated to testing, debugging, code quality, and regression prevention.
-
-### Focus areas
-
-- Unit testing
-- Widget testing
-- Integration testing
-- Runtime debugging
-- Static analysis
-- Test mocks
-- Code review
-- Security auditing
-- Layout debugging
-- Package conflict resolution
-- E2E testing
-- Test scaffolding
-- Codebase optimization
-
-### QA flow
-
-```text
-QA / Debug Pro Max
-        ↓
-Testing + Debugging Skills
-        ↓
-Project validation environment ready
-```
-
----
-
-# 🔗 Full Stack Pro Max
-
-<p align="center">
-  <img src="https://img.shields.io/badge/FULL%20STACK-2563EB?style=for-the-badge" alt="Full Stack Pro Max" />
-</p>
-
-Full Stack Pro Max is a **separate selectable mode** for complete application development.
-
-It activates:
-
-```text
-🎨 Frontend Pro Max
-        +
-⚙️ Backend Pro Max
-        +
-🧪 QA / Debug Pro Max
-        +
-🔗 Fullstack Extras
-```
-
-Optional backend framework support is also available.
-
-### Full Stack flow
-
-```text
-Full Stack Pro Max
-        ↓
-Choose Backend Framework
-        ↓
-Frontend + Backend + QA + Fullstack Extras
-        ↓
-Complete project environment ready
-```
-
-Recommended for:
-
-```text
-Complete Applications
-Flutter + Backend Projects
-Web + API Projects
-End-to-End Features
-Large Product Workflows
-```
-
----
-
-# 🧭 Available Modes
-
-Run:
+Repository scripts automatically synchronize version changes across installer definitions (`Antigravity-Pro-Max-Setup.iss`) and manifests via:
 
 ```powershell
-agpm
-```
-
-and choose:
-
-```text
-1. Frontend Pro Max
-2. Backend Pro Max
-3. QA / Debug Pro Max
-4. Full Stack Pro Max
-5. Default Antigravity
-6. Status
-```
-
-### Default Antigravity
-
-Removes Antigravity Pro Max managed skills from the selected project and returns the AGPM state to default.
-
-### Status
-
-Displays:
-
-```text
-Selected Project
-Current Mode
-Frontend Status
-Backend Status
-QA / Debug Status
-Fullstack Extras Status
-Backend Framework
-Project Skill Count
-Valid SKILL.md Count
-Invalid Skill Count
-Skill Location
-```
-
-Status does not activate or remove skills.
-
----
-
-# 📦 Project-Scoped Skill Management
-
-Antigravity Pro Max keeps managed skills at the project level.
-
-The selected project receives skills under:
-
-```text
-<Your Project>\.agents\skills
-```
-
-Example:
-
-```text
-MyProject
-│
-├── lib
-├── test
-├── assets
-│
-└── .agents
-    └── skills
-        ├── frontend-skill
-        ├── backend-skill
-        └── qa-skill
-```
-
-This keeps your Pro Max environment connected to the project instead of forcing every skill globally.
-
----
-
-# 🏗 Skill Architecture
-
-```text
-ANTIGRAVITY PRO MAX
-│
-├── 🎨 Frontend-Pro-Max
-│   ├── Flutter
-│   ├── Mobile
-│   ├── Web
-│   ├── UI / UX
-│   └── Performance
-│
-├── ⚙️ Backend-Pro-Max
-│   ├── APIs
-│   ├── Architecture
-│   ├── Authentication
-│   ├── Security
-│   ├── Databases
-│   └── Workflows
-│
-├── 🧪 QA-Debug-Pro-Max
-│   ├── Testing
-│   ├── Debugging
-│   ├── Static Analysis
-│   ├── Code Review
-│   └── Security Audit
-│
-├── 🔗 Fullstack-Extras
-│   └── Cross-stack orchestration
-│
-├── 🧩 Backend-Frameworks
-│   ├── Python
-│   │   ├── Async Python
-│   │   └── FastAPI
-│   │
-│   └── NodeJS
-│       └── Node.js Backend Patterns
-│
-└── 🧭 Loaders
-    ├── Project Selection
-    ├── Mode Selection
-    ├── Framework Selection
-    └── Skill Activation
+powershell -File .\scripts\Sync-Version.ps1
 ```
 
 ---
 
-# 🛡 Safe Installation Design
+## 🗺 Roadmap
 
-<p align="center">
-  <img src="https://img.shields.io/badge/SAFE-INSTALLATION-059669?style=for-the-badge" alt="Safe Installation" />
-</p>
-
-During installation, Antigravity Pro Max:
-
-```text
-✓ Downloads the runtime
-✓ Verifies required components
-✓ Installs skill packs
-✓ Creates the AGPM launcher
-✓ Registers the agpm command
-✓ Cleans temporary setup files
-```
-
-Installation does not:
-
-```text
-✗ Select a project
-✗ Activate a project mode automatically
-✗ Replace Antigravity built-in skills
-✗ Hardcode a Windows username
-✗ Ask for GitHub passwords
-✗ Ask for personal access tokens
-✗ Require application API keys
-```
+- [x] **Phase 0: Brand Migration**
+  - Establish Nexora Skills Manager identity.
+  - Introduce `nexora` CLI command with `agpm` backward compatibility.
+  - Dual version synchronization and installer updates.
+- [ ] **Phase 1: CLI Expansion**
+  - Implement standalone CLI subcommands (`scan`, `skills`, `update`, `doctor`).
+  - Add non-interactive flag support (e.g. `nexora --mode fullstack --project .`).
+- [ ] **Phase 2: Expanded Framework Ecosystem**
+  - Add Go, Rust, and Next.js / React 19 framework packs.
+  - Custom user skill registry and import support.
+- [ ] **Phase 3: Multi-Platform Installer & Cross-Platform Support**
+  - Native installer enhancements (WinGet / MSIX).
+  - macOS and Linux compatibility runners.
 
 ---
 
-# 🔐 Security
+## 🛡 Safe Installation & Security
 
-Antigravity Pro Max does not require users to provide:
-
-```text
-GitHub Personal Access Tokens
-API Keys
-Passwords
-Private Keys
-Project Secrets
-```
-
-The runtime is retrieved from the public distribution source.
-
-Project secrets should remain in secure application environments and never be placed inside frontend skill instructions.
+Nexora Skills Manager is built with security-first principles:
+- **Zero Credential Requests**: Never requests GitHub tokens, passwords, or private API keys.
+- **Local Isolation**: All skill actions take place locally within your chosen project folder.
+- **Non-Destructive**: Never deletes user source code. Skills are installed into `.agents/skills` and can be reset at any time with Mode `[5]`.
 
 ---
 
-# 🔄 Update / Reinstall
+## 📜 Open-Source Attribution & Notices
 
-To refresh Antigravity Pro Max, run the same setup command again:
-
-```powershell
-irm agpm.dev/install | iex
-```
-
-The installer detects the existing runtime and refreshes the managed components.
-
-Project activation remains separate.
+Nexora Skills Manager packages and coordinates high-quality open-source skill content from various upstream sources.
+For full licensing terms and attribution details, see [THIRD_PARTY_NOTICES.md](file:///d:/Nexora%20Skills%20Manager%20GitHub/THIRD_PARTY_NOTICES.md) and the [third-party-licenses](file:///d:/Nexora%20Skills%20Manager%20GitHub/third-party-licenses) directory.
 
 ---
 
-# 💻 Requirements
+## ⚠️ Disclaimer
 
-| Requirement | Value |
-|---|---|
-| Operating System | Windows |
-| Shell | Windows PowerShell |
-| Platform | Google Antigravity |
-| Internet | Required for installation |
-| Command | `agpm` |
-
----
-
-
-
----
-
-# 📜 Open-Source Attribution
-
-Antigravity Pro Max includes and organizes open-source skill material from multiple projects.
-
-Third-party notices and applicable licenses are available in:
-
-```text
-THIRD_PARTY_NOTICES.md
-```
-
-and:
-
-```text
-third-party-licenses/
-```
-
-Please review these files for detailed attribution and licensing information.
-
----
-
-# ⚠️ Disclaimer
-
-Antigravity Pro Max Skill is a community development project.
-
-It is **not an official Google or Google Antigravity product**.
-
-Google, Antigravity, Flutter, Dart, Python, FastAPI, Node.js, and other referenced technologies belong to their respective owners.
-
----
-
-# ✅ Project Status
-
-<p align="center">
-  <img src="https://img.shields.io/badge/SETUP-WORKING-059669?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/AGPM-WORKING-2563EB?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/PROJECT--SCOPED-SUPPORTED-7C3AED?style=for-the-badge" />
-</p>
-
-| Component | Status |
-|---|---|
-| One-Command Setup | ✅ Available |
-| AGPM Launcher | ✅ Working |
-| Frontend Pro Max | ✅ Available |
-| Backend Pro Max | ✅ Available |
-| QA / Debug Pro Max | ✅ Available |
-| Full Stack Pro Max | ✅ Available |
-| Python / FastAPI | ✅ Available |
-| Node.js | ✅ Available |
-| Project Selector | ✅ Working |
-| Project-Scoped Skills | ✅ Supported |
-| Built-in Skill Protection | ✅ Supported |
-
----
+Nexora Skills Manager is an independent community project and is not affiliated with or endorsed by Google. All trademarks belong to their respective owners.
 
 <p align="center">
   <br>
-  <strong>🪐 ANTIGRAVITY PRO MAX SKILL</strong>
-</p>
-
-<p align="center">
-  <strong>
-    🎨 Frontend &nbsp; • &nbsp;
-    ⚙️ Backend &nbsp; • &nbsp;
-    🧪 QA / Debug &nbsp; • &nbsp;
-    🔗 Full Stack
-  </strong>
-</p>
-
-<p align="center">
-  <strong>One setup. One command. The right skills for every project.</strong>
-</p>
-
-<p align="center">
-  Built for a cleaner Google Antigravity development workflow.
+  <strong>⚡ NEXORA SKILLS MANAGER</strong>
+  <br>
+  <em>Next-Generation Modular Skill Orchestration</em>
 </p>

@@ -1,9 +1,9 @@
-﻿# Third-Party Notices
+# Third-Party Notices
 
-Antigravity Pro Max Skill includes, redistributes, organizes, or adapts
+Nexora Skills Manager (formerly Antigravity Pro Max Skill) includes, redistributes, organizes, or adapts
 open-source skill content from third-party projects.
 
-The Antigravity Pro Max Skill project provides its own project-scoped
+The Nexora Skills Manager project provides its own project-scoped
 pack organization, loader scripts, mode-selection logic, launcher,
 installation workflow, documentation, and optimization structure.
 
@@ -67,10 +67,10 @@ third-party-licenses/rmyndharis-antigravity-skills-MIT.txt
 
 ## Distribution
 
-Antigravity Pro Max Skill redistributes the selected open-source
+Nexora Skills Manager redistributes the selected open-source
 materials as part of its optimized skill-pack system.
 
-Users of Antigravity Pro Max Skill do not need to separately download
+Users of Nexora Skills Manager do not need to separately download
 these upstream repositories for normal use.
 
 All original copyrights, license notices, and permissions remain with

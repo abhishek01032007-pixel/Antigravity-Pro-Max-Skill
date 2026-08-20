@@ -1,4 +1,4 @@
-﻿param(
+param(
     [string]$BaseRef,
     [string]$HeadRef = "HEAD"
 )
@@ -22,10 +22,12 @@ $CorePrefixes = @(
 )
 
 $CoreFiles = @(
+    "Start-Nexora-Skills-Manager.bat",
     "Start-Antigravity-Pro-Max.bat",
     "Antigravity-Pro-Max-Setup.iss",
     "install.ps1",
     "setup.ps1",
+    "nexora-version.json",
     "agpm-version.json"
 )
 

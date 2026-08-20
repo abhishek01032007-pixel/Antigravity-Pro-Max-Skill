@@ -17,6 +17,7 @@ $RuntimeFolders = @(
 )
 
 $RuntimeFiles = @(
+    "Start-Nexora-Skills-Manager.bat",
     "Start-Antigravity-Pro-Max.bat"
 )
 
@@ -28,10 +29,13 @@ $NonRuntimeItems = @(
     "install.ps1",
     "setup.ps1",
     ".gitignore",
-    "agpm.cmd"
+    "agpm.cmd",
+    "nexora.cmd",
+    "nexora-version.json",
+    "agpm-version.json"
 )
 
-$TempRoot = Join-Path $env:TEMP ("agpm-" + [guid]::NewGuid().ToString("N"))
+$TempRoot = Join-Path $env:TEMP ("nexora-" + [guid]::NewGuid().ToString("N"))
 $ZipPath  = Join-Path $TempRoot "source.zip"
 $Extract  = Join-Path $TempRoot "source"
 
@@ -52,11 +56,21 @@ function Write-Step {
 
 function Find-ExistingRuntime {
     foreach ($letter in [char[]]([char]'C'..[char]'Z')) {
-        $candidate = "$letter`:\Antigravity Pro Max Skill"
+        $candidateNexora = "$letter`:\Nexora Skills Manager"
+        if (
+            (Test-Path $candidateNexora) -and
+            (Test-Path (Join-Path $candidateNexora "Start-Nexora-Skills-Manager.bat"))
+        ) {
+            return $candidateNexora
+        }
 
+        $candidate = "$letter`:\Antigravity Pro Max Skill"
         if (
             (Test-Path $candidate) -and
-            (Test-Path (Join-Path $candidate "Start-Antigravity-Pro-Max.bat"))
+            (
+                (Test-Path (Join-Path $candidate "Start-Nexora-Skills-Manager.bat")) -or
+                (Test-Path (Join-Path $candidate "Start-Antigravity-Pro-Max.bat"))
+            )
         ) {
             return $candidate
         }
@@ -68,15 +82,19 @@ function Find-ExistingRuntime {
 try {
     Write-Host ""
     Write-Host "==============================================" -ForegroundColor Green
-    Write-Host "        ANTIGRAVITY PRO MAX INSTALLER" -ForegroundColor Green
+    Write-Host "        NEXORA SKILLS MANAGER INSTALLER" -ForegroundColor Green
     Write-Host "==============================================" -ForegroundColor Green
     Write-Host ""
 
     Write-Step "1/7" "Detecting installation"
 
-    if ($env:AGPM_INSTALL_PATH) {
+    if ($env:NEXORA_INSTALL_PATH) {
+        $InstallPath = $env:NEXORA_INSTALL_PATH
+        Write-Host "      Custom location detected (NEXORA_INSTALL_PATH)" -ForegroundColor Green
+    }
+    elseif ($env:AGPM_INSTALL_PATH) {
         $InstallPath = $env:AGPM_INSTALL_PATH
-        Write-Host "      Custom location detected" -ForegroundColor Green
+        Write-Host "      Legacy location detected (AGPM_INSTALL_PATH)" -ForegroundColor Green
     }
     else {
         $ExistingRuntime = Find-ExistingRuntime
@@ -105,7 +123,7 @@ try {
     Write-Host "      Ready" -ForegroundColor Green
 
 
-    Write-Step "3/7" "Downloading Pro Max"
+    Write-Step "3/7" "Downloading Nexora Skills Manager"
 
     Invoke-WebRequest `
         -Uri $DownloadUrl `
@@ -123,7 +141,7 @@ try {
         -Force
 
     $Source = Get-ChildItem $Extract -Directory |
-        Where-Object { $_.Name -like "$RepoName-*" } |
+        Where-Object { $_.Name -like "$RepoName-*" -or $_.Name -like "Nexora-Skills-Manager-*" } |
         Select-Object -First 1
 
     if (-not $Source) {
@@ -186,7 +204,7 @@ try {
     Write-Host "      Runtime installed" -ForegroundColor Green
 
 
-    Write-Step "6/7" "Installing AGPM command"
+    Write-Step "6/7" "Installing Nexora and legacy AGPM commands"
 
     New-Item `
         -ItemType Directory `
@@ -194,20 +212,74 @@ try {
         -Force |
         Out-Null
 
-    $AgpmLines = @(
+    $NexoraLines = @(
         '@echo off',
         'setlocal EnableExtensions',
         '',
         'for %%D in (C D E F G H I J K L M N O P Q R S T U V W X Y Z) do (',
+        '    if exist "%%D:\Nexora Skills Manager\Start-Nexora-Skills-Manager.bat" (',
+        '        call "%%D:\Nexora Skills Manager\Start-Nexora-Skills-Manager.bat" %*',
+        '        exit /b %ERRORLEVEL%',
+        '    )',
+        '    if exist "%%D:\Antigravity Pro Max Skill\Start-Nexora-Skills-Manager.bat" (',
+        '        call "%%D:\Antigravity Pro Max Skill\Start-Nexora-Skills-Manager.bat" %*',
+        '        exit /b %ERRORLEVEL%',
+        '    )',
         '    if exist "%%D:\Antigravity Pro Max Skill\Start-Antigravity-Pro-Max.bat" (',
-        '        call "%%D:\Antigravity Pro Max Skill\Start-Antigravity-Pro-Max.bat"',
-        '        exit /b 0',
+        '        call "%%D:\Antigravity Pro Max Skill\Start-Antigravity-Pro-Max.bat" %*',
+        '        exit /b %ERRORLEVEL%',
         '    )',
         ')',
         '',
         'echo.',
         'echo ========================================',
-        'echo       ANTIGRAVITY PRO MAX NOT FOUND',
+        'echo      NEXORA SKILLS MANAGER NOT FOUND',
+        'echo ========================================',
+        'echo.',
+        'echo Expected runtime folder:',
+        'echo   ^<Drive^>:\Antigravity Pro Max Skill',
+        'echo.',
+        'echo Run the installer again if the folder was removed.',
+        'echo.',
+        'pause',
+        'exit /b 1'
+    )
+
+    Set-Content `
+        -Path (Join-Path $CommandBin "nexora.cmd") `
+        -Value $NexoraLines `
+        -Encoding ASCII
+
+    $AgpmLines = @(
+        '@echo off',
+        'setlocal EnableExtensions',
+        '',
+        'echo.',
+        'echo ===============================================================================',
+        'echo  [NOTICE] The ''agpm'' command has transitioned to ''nexora'' (Nexora Skills Manager).',
+        'echo           Please use ''nexora'' in the future. Forwarding command...',
+        'echo ===============================================================================',
+        'echo.',
+        '',
+        'if exist "%~dp0nexora.cmd" (',
+        '    call "%~dp0nexora.cmd" %*',
+        '    exit /b %ERRORLEVEL%',
+        ')',
+        '',
+        'for %%D in (C D E F G H I J K L M N O P Q R S T U V W X Y Z) do (',
+        '    if exist "%%D:\Antigravity Pro Max Skill\Start-Nexora-Skills-Manager.bat" (',
+        '        call "%%D:\Antigravity Pro Max Skill\Start-Nexora-Skills-Manager.bat" %*',
+        '        exit /b %ERRORLEVEL%',
+        '    )',
+        '    if exist "%%D:\Antigravity Pro Max Skill\Start-Antigravity-Pro-Max.bat" (',
+        '        call "%%D:\Antigravity Pro Max Skill\Start-Antigravity-Pro-Max.bat" %*',
+        '        exit /b %ERRORLEVEL%',
+        '    )',
+        ')',
+        '',
+        'echo.',
+        'echo ========================================',
+        'echo      NEXORA SKILLS MANAGER NOT FOUND',
         'echo ========================================',
         'echo.',
         'echo Expected runtime folder:',
@@ -254,7 +326,7 @@ try {
         $env:Path = $env:Path.TrimEnd(";") + ";" + $CommandBin
     }
 
-    Write-Host "      Command ready: agpm" -ForegroundColor Green
+    Write-Host "      Command ready: nexora (and legacy agpm)" -ForegroundColor Green
 
 
     Write-Step "7/7" "Final verification"
@@ -271,6 +343,10 @@ try {
         }
     }
 
+    if (-not (Test-Path (Join-Path $CommandBin "nexora.cmd"))) {
+        throw "Verification failed: nexora command."
+    }
+
     if (-not (Test-Path (Join-Path $CommandBin "agpm.cmd"))) {
         throw "Verification failed: agpm command."
     }
@@ -279,15 +355,17 @@ try {
 
     Write-Host ""
     Write-Host "==============================================" -ForegroundColor Green
-    Write-Host "          ANTIGRAVITY PRO MAX READY" -ForegroundColor Green
+    Write-Host "          NEXORA SKILLS MANAGER READY" -ForegroundColor Green
     Write-Host "==============================================" -ForegroundColor Green
     Write-Host ""
     Write-Host "Installed at:" -ForegroundColor White
     Write-Host "  $InstallPath" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "Start Pro Max with:" -ForegroundColor White
+    Write-Host "Start Nexora Skills Manager with:" -ForegroundColor White
     Write-Host ""
-    Write-Host "  agpm" -ForegroundColor Cyan
+    Write-Host "  nexora" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "Legacy 'agpm' command is also enabled for compatibility." -ForegroundColor Yellow
     Write-Host ""
     Write-Host "No Antigravity project was selected or modified." `
         -ForegroundColor DarkGray
@@ -306,6 +384,7 @@ catch {
 
     exit 1
 }
+
 
 
 

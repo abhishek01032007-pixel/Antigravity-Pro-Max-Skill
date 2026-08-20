@@ -1,25 +1,16 @@
 @echo off
 setlocal
 
-title Nexora Skills Manager (Compatibility Launcher)
+title Nexora Skills Manager
 
 set "ROOT=%~dp0"
-set "NEXORA_LAUNCHER=%ROOT%Start-Nexora-Skills-Manager.bat"
-
-if exist "%NEXORA_LAUNCHER%" (
-    call "%NEXORA_LAUNCHER%" %*
-    exit /b %ERRORLEVEL%
-)
+set "SELECTOR=%ROOT%Loaders\agy-project.ps1"
 
 echo.
 echo ========================================
 echo        NEXORA SKILLS MANAGER
 echo ========================================
 echo.
-echo [COMPATIBILITY] Running legacy launcher...
-echo.
-
-set "SELECTOR=%ROOT%Loaders\agy-project.ps1"
 
 if not exist "%SELECTOR%" (
     echo [ERROR] Project selector was not found.
@@ -35,4 +26,3 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%SELECTOR%" %*
 
 echo.
 pause
-

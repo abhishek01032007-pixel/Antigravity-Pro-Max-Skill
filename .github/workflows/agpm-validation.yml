@@ -1,4 +1,4 @@
-﻿name: AGPM Validation
+name: Nexora Validation
 
 on:
   push:
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   validate:
-    name: Validate Antigravity Pro Max
+    name: Validate Nexora Skills Manager
     runs-on: windows-latest
 
     steps:
@@ -58,7 +58,7 @@ jobs:
           $diff = git status --porcelain -- "Antigravity-Pro-Max-Setup.iss"
 
           if ($diff) {
-            Write-Host "Installer version is not synchronized with agpm-version.json." -ForegroundColor Red
+            Write-Host "Installer version is not synchronized with version files." -ForegroundColor Red
             git diff -- "Antigravity-Pro-Max-Setup.iss"
             exit 1
           }
@@ -70,7 +70,8 @@ jobs:
         run: |
           Write-Host ""
           Write-Host "========================================" -ForegroundColor Cyan
-          Write-Host " AGPM AUTOMATION VALIDATION PASSED"
+          Write-Host " NEXORA AUTOMATION VALIDATION PASSED"
           Write-Host "========================================" -ForegroundColor Cyan
           Write-Host "Managed skills validated."
           Write-Host "Core version verified."
+

@@ -1,10 +1,10 @@
-﻿$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
 
 $installPath = "C:\Antigravity Pro Max Skill"
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "     ANTIGRAVITY PRO MAX SKILL" -ForegroundColor Cyan
+Write-Host "         NEXORA SKILLS MANAGER" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -17,7 +17,7 @@ if (-not (Test-Path $installPath)) {
 Write-Host "      OK" -ForegroundColor Green
 
 
-Write-Host "[2/4] Installing Antigravity Pro Max Skill..." -ForegroundColor Yellow
+Write-Host "[2/4] Installing Nexora Skills Manager..." -ForegroundColor Yellow
 
 Get-ChildItem $PSScriptRoot -Force |
 Where-Object {
@@ -39,6 +39,7 @@ $required = @(
     "QA-Debug-Pro-Max",
     "Fullstack-Extras",
     "Loaders",
+    "Start-Nexora-Skills-Manager.bat",
     "Start-Antigravity-Pro-Max.bat",
     "README.md",
     "THIRD_PARTY_NOTICES.md",
@@ -68,7 +69,7 @@ Write-Host "[4/4] Installation complete." -ForegroundColor Yellow
 Write-Host ""
 
 Write-Host "========================================" -ForegroundColor Green
-Write-Host " ANTIGRAVITY PRO MAX SKILL INSTALLED" -ForegroundColor Green
+Write-Host "   NEXORA SKILLS MANAGER INSTALLED" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
 
@@ -76,11 +77,14 @@ Write-Host "Installed to:" -ForegroundColor White
 Write-Host "C:\Antigravity Pro Max Skill" -ForegroundColor Cyan
 Write-Host ""
 
-Write-Host "Antigravity Pro Max Skill is ready to use." -ForegroundColor Green
+Write-Host "Nexora Skills Manager is ready to use." -ForegroundColor Green
 Write-Host ""
 Write-Host "No project has been changed." -ForegroundColor DarkGray
 Write-Host ""
 
 Write-Host "When you want to use it, run:" -ForegroundColor White
-Write-Host "Start-Antigravity-Pro-Max.bat" -ForegroundColor Cyan
+Write-Host "Start-Nexora-Skills-Manager.bat" -ForegroundColor Cyan
+Write-Host "or legacy:" -ForegroundColor White
+Write-Host "Start-Antigravity-Pro-Max.bat" -ForegroundColor Yellow
 Write-Host ""
+

@@ -1,7 +1,7 @@
-#define MyAppName "Antigravity Pro Max Skill"
+#define MyAppName "Nexora Skills Manager"
 #define MyAppVersion "1.0.0"
-#define MyAppPublisher "Antigravity Pro Max"
-#define MyAppExeName "Start-Antigravity-Pro-Max.bat"
+#define MyAppPublisher "Nexora Skills Manager"
+#define MyAppExeName "Start-Nexora-Skills-Manager.bat"
 
 [Setup]
 AppId={{5B102A94-54DA-47C5-B98F-42B45AC57724}
@@ -18,7 +18,7 @@ SolidCompression=yes
 WizardStyle=modern
 OutputDir=dist
 OutputBaseFilename=Antigravity-Pro-Max-Setup-1.0.0
-UninstallDisplayName=Antigravity Pro Max Skill
+UninstallDisplayName=Nexora Skills Manager
 SetupLogging=yes
 ChangesEnvironment=yes
 
@@ -29,6 +29,7 @@ Source: "QA-Debug-Pro-Max\*"; DestDir: "{app}\QA-Debug-Pro-Max"; Flags: ignoreve
 Source: "Fullstack-Extras\*"; DestDir: "{app}\Fullstack-Extras"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "Backend-Frameworks\*"; DestDir: "{app}\Backend-Frameworks"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "Loaders\*"; DestDir: "{app}\Loaders"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "Start-Nexora-Skills-Manager.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Start-Antigravity-Pro-Max.bat"; DestDir: "{app}"; Flags: ignoreversion
 
 [Registry]
@@ -59,31 +60,49 @@ begin
     Result := CommandBin;
 end;
 
-procedure CreateAgpmCommand;
+procedure CreateCommands;
 var
   CommandBin: String;
-  CommandFile: String;
-  CommandText: String;
+  NexoraCommandFile: String;
+  NexoraCommandText: String;
+  AgpmCommandFile: String;
+  AgpmCommandText: String;
 begin
   CommandBin := GetCommandBin('');
-  CommandFile := CommandBin + '\agpm.cmd';
+  NexoraCommandFile := CommandBin + '\nexora.cmd';
+  AgpmCommandFile := CommandBin + '\agpm.cmd';
 
   ForceDirectories(CommandBin);
 
-  CommandText :=
+  NexoraCommandText :=
     '@echo off' + #13#10 +
     'setlocal EnableExtensions' + #13#10 +
     'call "' + ExpandConstant('{app}') +
-    '\Start-Antigravity-Pro-Max.bat"' + #13#10 +
+    '\Start-Nexora-Skills-Manager.bat" %*' + #13#10 +
     'exit /b %ERRORLEVEL%' + #13#10;
 
-  SaveStringToFile(CommandFile, CommandText, False);
+  SaveStringToFile(NexoraCommandFile, NexoraCommandText, False);
+
+  AgpmCommandText :=
+    '@echo off' + #13#10 +
+    'setlocal EnableExtensions' + #13#10 +
+    'echo.' + #13#10 +
+    'echo ===============================================================================' + #13#10 +
+    'echo  [NOTICE] The ''agpm'' command has transitioned to ''nexora'' (Nexora Skills Manager).' + #13#10 +
+    'echo           Please use ''nexora'' in the future. Forwarding command...' + #13#10 +
+    'echo ===============================================================================' + #13#10 +
+    'echo.' + #13#10 +
+    'call "' + ExpandConstant('{app}') +
+    '\Start-Nexora-Skills-Manager.bat" %*' + #13#10 +
+    'exit /b %ERRORLEVEL%' + #13#10;
+
+  SaveStringToFile(AgpmCommandFile, AgpmCommandText, False);
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if CurStep = ssPostInstall then
-    CreateAgpmCommand;
+    CreateCommands;
 end;
 
 procedure RemoveCommandBinFromUserPath;
@@ -133,16 +152,22 @@ end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
-  CommandFile: String;
+  NexoraCommandFile: String;
+  AgpmCommandFile: String;
 begin
   if CurUninstallStep = usPostUninstall then
   begin
-    CommandFile :=
+    NexoraCommandFile :=
+      ExpandConstant('{localappdata}\AntigravityProMax\bin\nexora.cmd');
+    AgpmCommandFile :=
       ExpandConstant('{localappdata}\AntigravityProMax\bin\agpm.cmd');
 
-    if FileExists(CommandFile) then
-      DeleteFile(CommandFile);
+    if FileExists(NexoraCommandFile) then
+      DeleteFile(NexoraCommandFile);
+
+    if FileExists(AgpmCommandFile) then
+      DeleteFile(AgpmCommandFile);
 
     RemoveCommandBinFromUserPath;
   end;
-end;
+end;
