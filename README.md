@@ -30,6 +30,37 @@
 
 ---
 
+
+
+# 🚀 What Is Antigravity Pro Max?
+
+**Antigravity Pro Max Skill** is a project-scoped development skill manager for Google Antigravity.
+
+It organizes specialized development skills into focused packs so that a project can receive only the tools required for its current type of work.
+
+Instead of manually managing dozens of skills, you can run:
+
+```text
+agpm
+```
+
+and choose the development mode you need.
+
+Antigravity Pro Max currently supports:
+
+- 🎨 Frontend development
+- ⚙️ Backend development
+- 🧪 QA and debugging
+- 🔗 Full-stack development
+- 🐍 Python / FastAPI backend support
+- 🟩 Node.js backend support
+- 📱 Flutter and mobile development
+- 🌐 Web development
+- 🔐 Backend security
+- 🧪 Testing and static analysis
+- 🏗 Architecture and optimization
+
+---
 # ⚡ One-Command Setup
 
 Open **Windows PowerShell** and run:
@@ -91,36 +122,6 @@ agpm
 This opens the Antigravity Pro Max project selector.
 
 You do not need to type the complete installation path.
-
----
-
-# 🚀 What Is Antigravity Pro Max?
-
-**Antigravity Pro Max Skill** is a project-scoped development skill manager for Google Antigravity.
-
-It organizes specialized development skills into focused packs so that a project can receive only the tools required for its current type of work.
-
-Instead of manually managing dozens of skills, you can run:
-
-```text
-agpm
-```
-
-and choose the development mode you need.
-
-Antigravity Pro Max currently supports:
-
-- 🎨 Frontend development
-- ⚙️ Backend development
-- 🧪 QA and debugging
-- 🔗 Full-stack development
-- 🐍 Python / FastAPI backend support
-- 🟩 Node.js backend support
-- 📱 Flutter and mobile development
-- 🌐 Web development
-- 🔐 Backend security
-- 🧪 Testing and static analysis
-- 🏗 Architecture and optimization
 
 ---
 
