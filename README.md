@@ -1,21 +1,17 @@
 <p align="center">
   <br>
-  <strong>⚡</strong>
+  <img src="https://img.shields.io/badge/🪐%20Antigravity%20Pro%20Max%20Skill-0D1117?style=for-the-badge&logoColor=white" alt="Antigravity Pro Max Skill" />
 </p>
 
-<h1 align="center">
-  ANTIGRAVITY PRO MAX SKILL
-</h1>
+<h1 align="center">🪐 ANTIGRAVITY PRO MAX SKILL</h1>
 
-<h3 align="center">
-  Professional Skill Packs for Google Antigravity
-</h3>
+<h3 align="center">Professional Skill Packs for Google Antigravity</h3>
 
 <p align="center">
-  🎨 Frontend &nbsp;&nbsp; • &nbsp;&nbsp;
-  ⚙️ Backend &nbsp;&nbsp; • &nbsp;&nbsp;
-  🧪 QA / Debug &nbsp;&nbsp; • &nbsp;&nbsp;
-  🔗 Full Stack
+  <img src="https://img.shields.io/badge/Frontend-F59E0B?style=for-the-badge&logo=flutter&logoColor=white" />
+  <img src="https://img.shields.io/badge/Backend-8B5CF6?style=for-the-badge&logo=serverless&logoColor=white" />
+  <img src="https://img.shields.io/badge/QA%20%2F%20Debug-10B981?style=for-the-badge&logo=testinglibrary&logoColor=white" />
+  <img src="https://img.shields.io/badge/Full%20Stack-2563EB?style=for-the-badge&logo=stackshare&logoColor=white" />
 </p>
 
 <p align="center">
@@ -26,6 +22,12 @@
   A professional Windows skill-pack manager designed to give each
   Antigravity project the right development skills without replacing
   Antigravity's built-in skills.
+</p>
+
+<p align="center">
+  <sub>
+    Powerful skill modes for frontend, backend, QA/debug, and full-stack development.
+  </sub>
 </p>
 
 ---
