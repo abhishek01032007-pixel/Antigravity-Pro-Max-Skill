@@ -4,7 +4,7 @@
 </p>
 
 
-<h4 align="center">Professional Skill Packs for Google Antigravity</h4>
+<h2 align="center">Professional Skill Packs for Google Antigravity</h2>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Frontend-F59E0B?style=for-the-badge&logo=flutter&logoColor=white" />
