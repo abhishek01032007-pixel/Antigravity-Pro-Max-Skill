@@ -1,0 +1,76 @@
+﻿name: AGPM Validation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Antigravity Pro Max
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect change type
+        id: changes
+        shell: powershell
+        run: |
+          if ("${{ github.event_name }}" -eq "pull_request") {
+            powershell -NoProfile -ExecutionPolicy Bypass `
+              -File ".\scripts\Detect-ChangeType.ps1" `
+              -BaseRef "${{ github.event.pull_request.base.sha }}" `
+              -HeadRef "${{ github.event.pull_request.head.sha }}"
+          }
+          elseif ("${{ github.event.before }}" -and "${{ github.event.before }}" -ne "0000000000000000000000000000000000000000") {
+            powershell -NoProfile -ExecutionPolicy Bypass `
+              -File ".\scripts\Detect-ChangeType.ps1" `
+              -BaseRef "${{ github.event.before }}" `
+              -HeadRef "${{ github.sha }}"
+          }
+          else {
+            Write-Host "No usable base commit. Running repository validation only."
+          }
+
+      - name: Validate managed skills
+        shell: powershell
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass `
+            -File ".\scripts\Validate-Skills.ps1"
+
+      - name: Synchronize and verify core version
+        shell: powershell
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass `
+            -File ".\scripts\Sync-Version.ps1"
+
+          $diff = git status --porcelain -- "Antigravity-Pro-Max-Setup.iss"
+
+          if ($diff) {
+            Write-Host "Installer version is not synchronized with agpm-version.json." -ForegroundColor Red
+            git diff -- "Antigravity-Pro-Max-Setup.iss"
+            exit 1
+          }
+
+          Write-Host "Core version synchronization verified." -ForegroundColor Green
+
+      - name: Validation summary
+        shell: powershell
+        run: |
+          Write-Host ""
+          Write-Host "========================================" -ForegroundColor Cyan
+          Write-Host " AGPM AUTOMATION VALIDATION PASSED"
+          Write-Host "========================================" -ForegroundColor Cyan
+          Write-Host "Managed skills validated."
+          Write-Host "Core version verified."

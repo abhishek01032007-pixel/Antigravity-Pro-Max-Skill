@@ -33,3 +33,5 @@ Thumbs.db
 *.zip
 dist/
 *.iss.backup
+
+winget-manifests/
