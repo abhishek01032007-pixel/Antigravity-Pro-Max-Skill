@@ -7,9 +7,7 @@
 
 <h3 align="center">Professional Skill Packs for Google Antigravity</h3>
 
-<p align="center">
-  <strong>💻 Frontend • 🧩 Backend • 🐞 QA / Debug • 🔗 Full Stack</strong>
-</p>
+
 
 <p align="center">
   <img src="https://img.shields.io/badge/⌘%20FRONTEND-F59E0B?style=for-the-badge&labelColor=FDBA74&color=EA580C" alt="Frontend" />
