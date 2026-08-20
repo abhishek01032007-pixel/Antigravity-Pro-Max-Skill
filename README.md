@@ -1,5 +1,6 @@
 <p align="center">
   <br>
+  <img src="https://img.shields.io/badge/Antigravity%20Pro%20Max-Professional%20Skill%20Library-111827?style=for-the-badge&labelColor=7C3AED&color=111827" alt="Antigravity Pro Max Skill" />
 </p>
 
 <h1 align="center">🚀 ANTIGRAVITY PRO MAX SKILL</h1>
@@ -10,12 +11,17 @@
   <strong>Frontend • Backend • QA / Debug • Full Stack</strong>
 </p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Frontend-F59E0B?style=for-the-badge&logo=flutter&logoColor=white" alt="Frontend" />
+  <img src="https://img.shields.io/badge/Backend-8B5CF6?style=for-the-badge&logo=serverless&logoColor=white" alt="Backend" />
+  <img src="https://img.shields.io/badge/QA%20%2F%20Debug-10B981?style=for-the-badge&logo=testinglibrary&logoColor=white" alt="QA Debug" />
+  <img src="https://img.shields.io/badge/Full%20Stack-2563EB?style=for-the-badge&logo=stackshare&logoColor=white" alt="Full Stack" />
+</p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Frontend-F59E0B?style=for-the-badge&logo=flutter&logoColor=white" />
-  <img src="https://img.shields.io/badge/Backend-8B5CF6?style=for-the-badge&logo=serverless&logoColor=white" />
-  <img src="https://img.shields.io/badge/QA%20%2F%20Debug-10B981?style=for-the-badge&logo=testinglibrary&logoColor=white" />
-  <img src="https://img.shields.io/badge/Full%20Stack-2563EB?style=for-the-badge&logo=stackshare&logoColor=white" />
+  <img src="https://img.shields.io/badge/One%20Setup-One%20Command-0F766E?style=flat-square" alt="One Setup One Command" />
+  <img src="https://img.shields.io/badge/Project--Scoped-Skills-1D4ED8?style=flat-square" alt="Project Scoped Skills" />
+  <img src="https://img.shields.io/badge/Windows-Compatible-DC2626?style=flat-square" alt="Windows Compatible" />
 </p>
 
 <p align="center">
@@ -25,7 +31,7 @@
 <p align="center">
   A professional Windows skill-pack manager designed to give each
   Antigravity project the right development skills without replacing
-  Antigravity's built-in skills.
+  Antigravity’s built-in skills.
 </p>
 
 <p align="center">
@@ -35,6 +41,7 @@
 </p>
 
 ---
+
 
 # 🚀 About Antigravity Pro Max
 
