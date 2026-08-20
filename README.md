@@ -1,17 +1,20 @@
 <p align="center">
   <br>
-  <img src="https://img.shields.io/badge/🪐%20Antigravity%20Pro%20Max%20Skill-0D1117?style=for-the-badge&logoColor=white" alt="Antigravity Pro Max Skill" />
 </p>
 
-<h1 align="center">🪐 ANTIGRAVITY PRO MAX SKILL</h1>
+<h1 align="center">🚀 ANTIGRAVITY PRO MAX SKILL</h1>
 
 <h3 align="center">Professional Skill Packs for Google Antigravity</h3>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Frontend-F59E0B?style=for-the-badge&logo=flutter&logoColor=white" />
-  <img src="https://img.shields.io/badge/Backend-8B5CF6?style=for-the-badge&logo=serverless&logoColor=white" />
-  <img src="https://img.shields.io/badge/QA%20%2F%20Debug-10B981?style=for-the-badge&logo=testinglibrary&logoColor=white" />
-  <img src="https://img.shields.io/badge/Full%20Stack-2563EB?style=for-the-badge&logo=stackshare&logoColor=white" />
+  <strong>Frontend • Backend • QA / Debug • Full Stack</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Frontend%20Pro%20Max-F59E0B?style=flat-square" />
+  <img src="https://img.shields.io/badge/Backend%20Pro%20Max-8B5CF6?style=flat-square" />
+  <img src="https://img.shields.io/badge/QA%20%2F%20Debug%20Pro%20Max-10B981?style=flat-square" />
+  <img src="https://img.shields.io/badge/Full%20Stack%20Pro%20Max-2563EB?style=flat-square" />
 </p>
 
 <p align="center">
@@ -24,12 +27,7 @@
   Antigravity's built-in skills.
 </p>
 
-<p align="center">
-  <sub>
-    Powerful skill modes for frontend, backend, QA/debug, and full-stack development.
-  </sub>
-</p>
-
+---
 ---
 
 # 🚀 About Antigravity Pro Max
