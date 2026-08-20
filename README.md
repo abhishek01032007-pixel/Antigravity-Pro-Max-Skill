@@ -1,27 +1,30 @@
 <p align="center">
   <br>
-  <img src="https://img.shields.io/badge/Antigravity%20Pro%20Max-Professional%20Skill%20Library-111827?style=for-the-badge&labelColor=7C3AED&color=111827" alt="Antigravity Pro Max Skill" />
+  <img src="https://img.shields.io/badge/ANTIGRAVITY-PRO%20MAX%20SKILL-0B1020?style=for-the-badge&labelColor=A855F7&color=111827" alt="Antigravity Pro Max Skill" />
 </p>
 
-<h1 align="center">🪐 ANTIGRAVITY PRO MAX SKILL</h1>
+<h1 align="center">🌌 ANTIGRAVITY PRO MAX SKILL</h1>
 
 <h3 align="center">Professional Skill Packs for Google Antigravity</h3>
 
 <p align="center">
-  <strong>Frontend • Backend • QA / Debug • Full Stack</strong>
+  <strong>💻 Frontend • 🧩 Backend • 🐞 QA / Debug • 🔗 Full Stack</strong>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Frontend-F59E0B?style=for-the-badge&logo=flutter&logoColor=white" alt="Frontend" />
-  <img src="https://img.shields.io/badge/Backend-8B5CF6?style=for-the-badge&logo=serverless&logoColor=white" alt="Backend" />
-  <img src="https://img.shields.io/badge/QA%20%2F%20Debug-10B981?style=for-the-badge&logo=testinglibrary&logoColor=white" alt="QA Debug" />
-  <img src="https://img.shields.io/badge/Full%20Stack-2563EB?style=for-the-badge&logo=stackshare&logoColor=white" alt="Full Stack" />
+  <img src="https://img.shields.io/badge/⌘%20FRONTEND-FF8A00?style=for-the-badge&labelColor=FFB347&color=F59E0B" alt="Frontend" />
+  <img src="https://img.shields.io/badge/🧩%20BACKEND-7C3AED?style=for-the-badge&labelColor=A78BFA&color=8B5CF6" alt="Backend" />
+  <img src="https://img.shields.io/badge/🐞%20QA%20%2F%20DEBUG-00B894?style=for-the-badge&labelColor=55EFC4&color=10B981" alt="QA Debug" />
+  <img src="https://img.shields.io/badge/🔗%20FULL%20STACK-2563EB?style=for-the-badge&labelColor=60A5FA&color=1D4ED8" alt="Full Stack" />
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/One%20Setup-One%20Command-0F766E?style=flat-square" alt="One Setup One Command" />
-  <img src="https://img.shields.io/badge/Project--Scoped-Skills-1D4ED8?style=flat-square" alt="Project Scoped Skills" />
-  <img src="https://img.shields.io/badge/Windows-Compatible-DC2626?style=flat-square" alt="Windows Compatible" />
+  <img src="https://img.shields.io/badge/One%20Setup-374151?style=flat-square" alt="One Setup" />
+  <img src="https://img.shields.io/badge/One%20Command-0F766E?style=flat-square" alt="One Command" />
+  <img src="https://img.shields.io/badge/Project--Scoped-4B5563?style=flat-square" alt="Project Scoped" />
+  <img src="https://img.shields.io/badge/Skills-2563EB?style=flat-square" alt="Skills" />
+  <img src="https://img.shields.io/badge/Windows-4B5563?style=flat-square" alt="Windows" />
+  <img src="https://img.shields.io/badge/Compatible-DC2626?style=flat-square" alt="Compatible" />
 </p>
 
 <p align="center">
@@ -32,12 +35,6 @@
   A professional Windows skill-pack manager designed to give each
   Antigravity project the right development skills without replacing
   Antigravity’s built-in skills.
-</p>
-
-<p align="center">
-  <sub>
-    Powerful skill modes for frontend, backend, QA/debug, and full-stack development.
-  </sub>
 </p>
 
 ---
