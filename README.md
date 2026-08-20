@@ -23,69 +23,85 @@
 </p>
 
 <p align="center">
-  A portable Windows skill-pack manager designed to give each
+  A professional Windows skill-pack manager designed to give each
   Antigravity project the right development skills without replacing
   Antigravity's built-in skills.
 </p>
 
 ---
 
-
-
-# 🚀 What Is Antigravity Pro Max?
+# 🚀 About Antigravity Pro Max
 
 **Antigravity Pro Max Skill** is a project-scoped development skill manager for Google Antigravity.
 
-It organizes specialized development skills into focused packs so that a project can receive only the tools required for its current type of work.
+It organizes specialized development capabilities into focused skill packs so that each project receives only the tools required for its current type of work.
 
-Instead of manually managing dozens of skills, you can run:
+Instead of manually managing dozens of development skills, install Antigravity Pro Max once and start it anytime with:
 
-```text
+```powershell
 agpm
 ```
 
-and choose the development mode you need.
-
-Antigravity Pro Max currently supports:
+Antigravity Pro Max supports:
 
 - 🎨 Frontend development
 - ⚙️ Backend development
-- 🧪 QA and debugging
+- 🧪 QA, debugging, and testing
 - 🔗 Full-stack development
-- 🐍 Python / FastAPI backend support
-- 🟩 Node.js backend support
 - 📱 Flutter and mobile development
 - 🌐 Web development
+- 🐍 Python / FastAPI backend support
+- 🟩 Node.js backend support
 - 🔐 Backend security
-- 🧪 Testing and static analysis
+- 🧪 Static analysis and regression testing
 - 🏗 Architecture and optimization
+- 📦 Project-scoped skill activation
 
 ---
+
 # ⚡ One-Command Setup
 
 Open **Windows PowerShell** and run:
 
 ```powershell
-irm https://raw.githubusercontent.com/abhishek01032007-pixel/Antigravity-Pro-Max-Skill/main/setup.ps1 | iex
+irm agpm.dev/install | iex
 ```
 
-> Copy the command above, paste it into PowerShell, and press **Enter**.
+That's it.
 
-The installer automatically downloads, prepares, installs, and verifies the Antigravity Pro Max runtime.
+The setup automatically:
 
-No project is selected or modified during installation.
+```text
+Download Antigravity Pro Max
+        ↓
+Prepare the runtime
+        ↓
+Verify required skill packs
+        ↓
+Install the Pro Max environment
+        ↓
+Create the permanent AGPM command
+        ↓
+Register AGPM for the current Windows user
+        ↓
+Clean temporary installation files
+        ↓
+Ready
+```
+
+> Installation does not select or modify an Antigravity project.
 
 ---
 
-# 📍 Where Antigravity Pro Max Is Installed
+# 📍 Installation Location
 
-The Antigravity Pro Max runtime is installed by default at:
+Antigravity Pro Max is installed by default at:
 
 ```text
 C:\Antigravity Pro Max Skill
 ```
 
-The runtime contains the main development skill packs and loader system.
+The installed runtime contains:
 
 ```text
 C:\Antigravity Pro Max Skill
@@ -99,73 +115,79 @@ C:\Antigravity Pro Max Skill
 └── Start-Antigravity-Pro-Max.bat
 ```
 
-The permanent `agpm` launcher is registered separately for the current Windows user at:
+The permanent `agpm` command is registered separately for the current Windows user at:
 
 ```text
 %LOCALAPPDATA%\AntigravityProMax\bin
 ```
 
-For example, Windows automatically resolves `%LOCALAPPDATA%` for each user.
+Windows automatically resolves `%LOCALAPPDATA%` for every user.
 
-No personal Windows username is hardcoded into the project.
+No personal Windows username is hardcoded into the installer.
 
 ---
 
 # ▶️ Start Antigravity Pro Max
 
-After installation, open PowerShell and type:
+After installation, open PowerShell and run:
 
 ```powershell
 agpm
 ```
 
-This opens the Antigravity Pro Max project selector.
+This opens the **Antigravity Pro Max project selector**.
 
-You do not need to type the complete installation path.
+You do not need to enter the complete installation path.
 
 ---
 
 # 🧠 How It Works
 
 ```text
-                    INSTALL
-                       │
-                       ▼
-           Antigravity Pro Max Runtime
-                       │
-                       ▼
-                    agpm
-                       │
-                       ▼
-              Select Your Project
-                       │
-                       ▼
-               Select Work Mode
-                       │
-       ┌───────────────┼───────────────┐
-       │               │               │
-       ▼               ▼               ▼
- 🎨 FRONTEND       ⚙️ BACKEND      🧪 QA / DEBUG
-   PRO MAX           PRO MAX          PRO MAX
-       │               │               │
-       └───────────────┼───────────────┘
-                       │
-                       ▼
-                 🔗 FULL STACK
-                    PRO MAX
-                       │
-                       ▼
-             Project Skill Folder
-                       │
-                       ▼
-               .agents\skills
+                         INSTALL
+                            │
+                            ▼
+              Antigravity Pro Max Runtime
+                            │
+                            ▼
+                          agpm
+                            │
+                            ▼
+                   Select Your Project
+                            │
+                            ▼
+                    Select Work Mode
+                            │
+       ┌────────────────────┼────────────────────┬────────────────────┐
+       │                    │                    │                    │
+       ▼                    ▼                    ▼                    ▼
+ 🎨 FRONTEND           ⚙️ BACKEND          🧪 QA / DEBUG       🔗 FULL STACK
+   PRO MAX               PRO MAX              PRO MAX             PRO MAX
+       │                    │                    │                    │
+       └────────────────────┴────────────────────┴────────────────────┘
+                                  │
+                                  ▼
+                         Project Skill Folder
+                                  │
+                                  ▼
+                           .agents\skills
+                                  │
+                                  ▼
+                         Continue Development
 ```
 
-Installation and project activation are separate operations.
+The four main modes are separate selectable environments:
 
-The installer prepares Antigravity Pro Max.
+```text
+🎨 Frontend Pro Max
+⚙️ Backend Pro Max
+🧪 QA / Debug Pro Max
+🔗 Full Stack Pro Max
+```
 
-The `agpm` command is what you use later when you want to configure a project.
+Full Stack Pro Max is its own mode.
+
+It is not a second step after Frontend, Backend, or QA.
 
 ---
 
@@ -200,6 +222,8 @@ Responsive Websites
 Frontend UI/UX Work
 ```
 
+Frontend mode can also optionally include QA / Debug support when required.
+
 ---
 
 # ⚙️ Backend Pro Max
@@ -225,20 +249,20 @@ It includes support for:
 
 ### Backend Framework Support
 
-Antigravity Pro Max also contains optional framework skills for:
+Optional backend framework skills are available for:
 
 ```text
 🐍 Python / FastAPI
 🟩 Node.js
 ```
 
-These framework skills can be selected when they are relevant to the backend project.
+Backend mode can also optionally include QA / Debug support.
 
 ---
 
 # 🧪 QA / Debug Pro Max
 
-QA / Debug Pro Max is focused on software quality, testing, debugging, code review, and regression prevention.
+QA / Debug Pro Max is designed for software quality, debugging, validation, and regression prevention.
 
 It includes skills for:
 
@@ -268,13 +292,15 @@ Code Quality Validation
 Runtime Error Investigation
 ```
 
+QA / Debug can be selected as its own mode.
+
 ---
 
 # 🔗 Full Stack Pro Max
 
-Full Stack Pro Max is designed for projects that require frontend, backend, testing, and orchestration together.
+Full Stack Pro Max is a separate mode designed for complete application development.
 
-It combines the major Antigravity Pro Max development capabilities:
+It activates the major development packs together:
 
 ```text
 🎨 Frontend Pro Max
@@ -286,15 +312,26 @@ It combines the major Antigravity Pro Max development capabilities:
 🔗 Fullstack Extras
 ```
 
-Full Stack mode is useful for complete product development where multiple parts of the application need to be handled together.
+Full Stack Pro Max is useful when the same project requires frontend, backend, testing, and cross-stack orchestration.
+
+### Recommended for
+
+```text
+Complete Applications
+Flutter + Backend Projects
+Web + API Projects
+Large Product Features
+End-to-End Development
+Cross-Stack Workflows
+```
 
 ---
 
 # 📦 Project-Scoped Skill Management
 
-Antigravity Pro Max does not need to load every skill globally.
+Antigravity Pro Max does not need to activate every skill globally.
 
-When you select a project, the required managed skills are placed under:
+When you choose a project and select a mode, the required managed skills are prepared under:
 
 ```text
 <Your Project>\.agents\skills
@@ -316,46 +353,66 @@ MyProject
         └── ...
 ```
 
-This keeps the active skill environment connected to the project you selected.
+This keeps the selected Antigravity Pro Max environment associated with the project you are working on.
 
 ---
 
-# 🛡️ Safe Installation Design
+# 🧭 Mode Selection
 
-Antigravity Pro Max is designed to avoid unnecessary changes during setup.
+When you run:
 
-### During installation
-
-The installer:
-
-```text
-✓ Downloads the runtime
-✓ Verifies required files
-✓ Installs the skill packs
-✓ Creates the AGPM launcher
-✓ Registers the AGPM command
-✓ Cleans temporary installation files
+```powershell
+agpm
 ```
 
-The installer does **not**:
+you can choose from:
 
 ```text
-✗ Select an Antigravity project
-✗ Automatically activate a project mode
-✗ Replace Antigravity built-in skills
-✗ Require a hardcoded Windows username
-✗ Store GitHub passwords or access tokens
+1. Frontend Pro Max
+2. Backend Pro Max
+3. QA / Debug Pro Max
+4. Full Stack Pro Max
+5. Default Antigravity
+6. Status
 ```
+
+### Frontend Pro Max
+
+Activates frontend-focused development skills.
+
+You can optionally add QA / Debug support.
+
+### Backend Pro Max
+
+Activates backend development skills.
+
+You can optionally select a backend framework and QA / Debug support.
+
+### QA / Debug Pro Max
+
+Activates QA and debugging skills independently.
+
+### Full Stack Pro Max
+
+Activates Frontend + Backend + QA / Debug + Fullstack Extras.
+
+### Default Antigravity
+
+Returns the selected project to the default managed state.
+
+### Status
+
+Displays the current project configuration and active skill information.
 
 ---
 
 # ⚡ Simple Workflow
 
-Using Antigravity Pro Max is designed to stay simple.
-
 ### 1. Install once
 
-Run the setup command at the top of this README.
+```powershell
+irm agpm.dev/install | iex
+```
 
 ### 2. Start when needed
 
@@ -363,62 +420,70 @@ Run the setup command at the top of this README.
 agpm
 ```
 
-### 3. Select a project
+### 3. Select your project
 
-Choose the project folder you want Antigravity Pro Max to manage.
+Choose the Antigravity project you want to configure.
 
-### 4. Select your mode
-
-Choose the development environment required for the project.
+### 4. Select the required mode
 
 ```text
 Frontend Pro Max
 Backend Pro Max
 QA / Debug Pro Max
 Full Stack Pro Max
-Default Antigravity
-Status
 ```
 
 ### 5. Continue development
 
-The appropriate managed skills are prepared for that project.
+The appropriate managed skills are prepared for your selected project.
 
 ---
 
-# 🖥️ Example
+# 🖥️ Example Workflows
 
-For a Flutter UI project:
+### Flutter Frontend Project
 
 ```text
 agpm
   ↓
-Select Flutter Project
+Select Project
   ↓
 Frontend Pro Max
   ↓
-Optional QA / Debug support
+Optional QA / Debug
   ↓
-Frontend skills ready
+Frontend development environment ready
 ```
 
-For a backend API:
+### Backend Project
 
 ```text
 agpm
   ↓
-Select Backend Project
+Select Project
   ↓
 Backend Pro Max
   ↓
-Select backend framework when required
+Optional Backend Framework
   ↓
-Optional QA / Debug support
+Optional QA / Debug
   ↓
-Backend skills ready
+Backend development environment ready
 ```
 
-For a complete application:
+### QA / Debug Project
+
+```text
+agpm
+  ↓
+Select Project
+  ↓
+QA / Debug Pro Max
+  ↓
+Testing and debugging environment ready
+```
+
+### Full Stack Project
 
 ```text
 agpm
@@ -427,7 +492,9 @@ Select Project
   ↓
 Full Stack Pro Max
   ↓
-Frontend + Backend + QA + Fullstack skills
+Frontend + Backend + QA + Fullstack Extras
+  ↓
+Full-stack development environment ready
 ```
 
 ---
@@ -479,9 +546,62 @@ ANTIGRAVITY PRO MAX
 
 ---
 
-# 💻 Requirements
+# 🛡️ Safe Installation Design
 
-Antigravity Pro Max currently targets:
+During installation, Antigravity Pro Max:
+
+```text
+✓ Downloads the runtime
+✓ Verifies required components
+✓ Installs the skill packs
+✓ Creates the permanent AGPM launcher
+✓ Registers the AGPM command
+✓ Cleans temporary setup files
+```
+
+Installation does not:
+
+```text
+✗ Select an Antigravity project
+✗ Automatically activate a project mode
+✗ Replace Antigravity built-in skills
+✗ Require a hardcoded Windows username
+✗ Ask for GitHub passwords
+✗ Ask for GitHub Personal Access Tokens
+✗ Require application API keys
+```
+
+Project activation happens only after the user runs:
+
+```powershell
+agpm
+```
+
+and selects a project.
+
+---
+
+# 🔐 Security
+
+Antigravity Pro Max does not require users to enter:
+
+```text
+GitHub Personal Access Tokens
+API Keys
+Passwords
+Private Keys
+Project Secrets
+```
+
+The public installation system retrieves the required runtime automatically.
+
+Application secrets should remain inside the appropriate secure backend or environment configuration.
+
+Frontend skill instructions should never contain private backend credentials.
+
+---
+
+# 💻 Requirements
 
 ```text
 Operating System : Windows
@@ -490,17 +610,21 @@ Platform         : Google Antigravity
 Internet         : Required during installation
 ```
 
-The installer downloads the required runtime directly from this public GitHub repository.
+After the initial installation, `agpm` is available as the primary command for managing Antigravity Pro Max projects.
 
 ---
 
-# 🔄 Reinstall / Update
+# 🔄 Update / Reinstall
 
-Running the same setup command again allows the installer to refresh the Antigravity Pro Max runtime using the current repository version.
+To refresh Antigravity Pro Max, run the same setup command again:
 
-The installer first detects an existing runtime and then refreshes the managed runtime components.
+```powershell
+irm agpm.dev/install | iex
+```
 
-Your project is not automatically selected during this process.
+The installer detects the existing Antigravity Pro Max environment and refreshes the managed runtime components.
+
+It does not automatically select or modify one of your Antigravity projects during the update.
 
 ---
 
@@ -531,24 +655,6 @@ Antigravity-Pro-Max-Skill
 
 ---
 
-# 🔐 Security
-
-Antigravity Pro Max is designed so that public installation does not require users to provide:
-
-```text
-GitHub Personal Access Tokens
-API Keys
-Passwords
-Private Keys
-Project Secrets
-```
-
-The installation script uses the public repository to retrieve the runtime.
-
-Application secrets should always remain inside the appropriate secure backend or environment configuration and should never be placed inside frontend skill instructions.
-
----
-
 # 📜 Open-Source Attribution
 
 Antigravity Pro Max includes and organizes open-source skill material from multiple projects.
@@ -575,7 +681,7 @@ Antigravity Pro Max Skill is a community development project.
 
 It is **not an official Google or Google Antigravity product**.
 
-Google, Antigravity, Flutter, Dart, Node.js, Python, FastAPI, and other referenced names belong to their respective owners.
+Google, Antigravity, Flutter, Dart, Python, FastAPI, Node.js, and other referenced names belong to their respective owners.
 
 ---
 
@@ -583,7 +689,8 @@ Google, Antigravity, Flutter, Dart, Node.js, Python, FastAPI, and other referenc
 
 | Component | Status |
 |---|---|
-| ⚡ Setup Installer | ✅ Working |
+| ⚡ One-Command Setup | ✅ Available |
+| ⚡ AGPM Launcher | ✅ Working |
 | 🎨 Frontend Pro Max | ✅ Available |
 | ⚙️ Backend Pro Max | ✅ Available |
 | 🧪 QA / Debug Pro Max | ✅ Available |
@@ -591,8 +698,8 @@ Google, Antigravity, Flutter, Dart, Node.js, Python, FastAPI, and other referenc
 | 🐍 Python / FastAPI | ✅ Available |
 | 🟩 Node.js | ✅ Available |
 | 🧭 Project Selector | ✅ Working |
-| ⚡ `agpm` Command | ✅ Working |
-| 📦 Project-Scoped Activation | ✅ Supported |
+| 📦 Project-Scoped Skills | ✅ Supported |
+| 🛡 Built-in Skill Protection | ✅ Supported |
 
 ---
 
@@ -603,12 +710,15 @@ Google, Antigravity, Flutter, Dart, Node.js, Python, FastAPI, and other referenc
 
 <p align="center">
   <strong>
-    Frontend • Backend • QA / Debug • Full Stack
+    🎨 Frontend &nbsp; • &nbsp;
+    ⚙️ Backend &nbsp; • &nbsp;
+    🧪 QA / Debug &nbsp; • &nbsp;
+    🔗 Full Stack
   </strong>
 </p>
 
 <p align="center">
-  One setup. One command. The right skills for every project.
+  <strong>One setup. One command. The right skills for every project.</strong>
 </p>
 
 <p align="center">
