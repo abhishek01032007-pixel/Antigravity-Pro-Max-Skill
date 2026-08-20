@@ -13,8 +13,7 @@ Instead of loading every skill globally, Pro Max copies the selected skills only
 Open **PowerShell** and paste this single command:
 
 ```powershell
-$t=Join-Path $env:TEMP ("agpm-"+[guid]::NewGuid().ToString("N")); New-Item -ItemType Directory -Path $t -Force | Out-Null; $z=Join-Path $t "repo.zip"; Invoke-WebRequest "https://github.com/abhishek01032007-pixel/Antigravity-Pro-Max-Skill/archive/refs/heads/main.zip" -OutFile $z -UseBasicParsing; Expand-Archive $z -DestinationPath $t -Force; $r=Get-ChildItem $t -Directory | Where-Object Name -like "Antigravity-Pro-Max-Skill-*" | Select-Object -First 1; powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $r.FullName "install.ps1"); Remove-Item $t -Recurse -Force -ErrorAction SilentlyContinue
-```
+irm https://git.io/agpm | iex
 
 ### What this command does
 
