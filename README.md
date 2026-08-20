@@ -3,7 +3,7 @@
   <img src="https://img.shields.io/badge/Antigravity%20Pro%20Max-Professional%20Skill%20Library-111827?style=for-the-badge&labelColor=7C3AED&color=111827" alt="Antigravity Pro Max Skill" />
 </p>
 
-<h1 align="center">🚀 ANTIGRAVITY PRO MAX SKILL</h1>
+<h1 align="center">🪐 ANTIGRAVITY PRO MAX SKILL</h1>
 
 <h3 align="center">Professional Skill Packs for Google Antigravity</h3>
 
@@ -41,7 +41,6 @@
 </p>
 
 ---
-
 
 # 🚀 About Antigravity Pro Max
 
