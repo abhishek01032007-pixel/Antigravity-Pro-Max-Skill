@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
 
 $RepoOwner = "abhishek01032007-pixel"
 $RepoName  = "Antigravity-Pro-Max-Skill"
@@ -27,7 +27,7 @@ $NonRuntimeItems = @(
     "third-party-licenses",
     "install.ps1",
     "setup.ps1",
-    "\.gitignore",
+    ".gitignore",
     "agpm.cmd"
 )
 

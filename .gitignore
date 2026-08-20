@@ -31,3 +31,5 @@ Thumbs.db
 
 # Archives generated locally
 *.zip
+dist/
+*.iss.backup
