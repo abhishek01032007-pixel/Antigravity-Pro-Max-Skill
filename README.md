@@ -550,30 +550,7 @@ Project activation remains separate.
 
 ---
 
-# 📁 Repository Structure
 
-```text
-Antigravity-Pro-Max-Skill
-│
-├── Backend-Frameworks
-│   ├── NodeJS
-│   └── Python
-│
-├── Backend-Pro-Max
-├── Frontend-Pro-Max
-├── Fullstack-Extras
-├── Loaders
-├── QA-Debug-Pro-Max
-│
-├── third-party-licenses
-│
-├── Start-Antigravity-Pro-Max.bat
-├── setup.ps1
-├── install.ps1
-├── THIRD_PARTY_NOTICES.md
-├── LICENSE
-└── README.md
-```
 
 ---
 
