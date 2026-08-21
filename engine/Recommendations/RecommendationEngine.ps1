@@ -1,4 +1,4 @@
-# RecommendationEngine.ps1 - Minimal-overhead intelligent skill matcher & conflict resolver
+# RecommendationEngine.ps1 - Intelligent skill matcher with classification-aware scoring & human-readable reasons
 
 function Get-NexoraSkillRecommendations {
     param(
@@ -9,77 +9,146 @@ function Get-NexoraSkillRecommendations {
     )
 
     $recommended = [System.Collections.Generic.List[psobject]]::new()
+
+    # Normalize detected values for matching
     $techs = @($Analysis.detectedTechnologies | ForEach-Object { $_.ToLower() })
     $frameworks = @($Analysis.detectedFrameworks | ForEach-Object { $_.ToLower() })
+    $languages = @()
+    $frontendStack = @()
+    $backendStack = @()
+    $dbStack = @()
+    $qaStack = @()
 
-    $isFlutter = $frameworks -contains "flutter" -or $techs -contains "dart"
-    $isReact = $frameworks -contains "react" -or $frameworks -contains "next.js"
-    $isPython = $techs -contains "python" -or $frameworks -contains "fastapi" -or $frameworks -contains "django"
+    if ($Analysis.PSObject.Properties["languages"] -and $Analysis.languages) {
+        $languages = @($Analysis.languages | ForEach-Object { $_.ToLower() })
+    }
+    if ($Analysis.PSObject.Properties["frontend"] -and $Analysis.frontend) {
+        $frontendStack = @($Analysis.frontend | ForEach-Object { $_.ToLower() })
+    }
+    if ($Analysis.PSObject.Properties["backend"] -and $Analysis.backend) {
+        $backendStack = @($Analysis.backend | ForEach-Object { $_.ToLower() })
+    }
+    if ($Analysis.PSObject.Properties["database"] -and $Analysis.database) {
+        $dbStack = @($Analysis.database | ForEach-Object { $_.ToLower() })
+    }
+    if ($Analysis.PSObject.Properties["qa"] -and $Analysis.qa) {
+        $qaStack = @($Analysis.qa | ForEach-Object { $_.ToLower() })
+    }
+
+    # Classification context
+    $projectType = if ($Analysis.PSObject.Properties["projectType"]) { $Analysis.projectType } else { "unknown" }
+    $devMode = if ($Analysis.PSObject.Properties["developmentMode"]) { $Analysis.developmentMode } else { "mixed" }
+
+    # Derived flags
+    $isFlutter = $frameworks -contains "flutter" -or $techs -contains "dart" -or $frontendStack -contains "flutter"
+    $isReact = $frameworks -contains "react" -or $frameworks -contains "next.js" -or $frontendStack -contains "react" -or $frontendStack -contains "next.js"
+    $isPython = $techs -contains "python" -or $frameworks -contains "fastapi" -or $frameworks -contains "django" -or $frameworks -contains "flask"
     $isNode = $techs -contains "node.js" -or $frameworks -contains "express" -or $frameworks -contains "nestjs"
+    $isMobile = $projectType -eq "mobile_application"
+    $isFullStack = $projectType -eq "full_stack_application" -or $devMode -eq "full_stack"
+    $hasBackend = $backendStack.Count -gt 0 -or $isPython -or $isNode
+    $hasDatabase = $dbStack.Count -gt 0 -or $techs -contains "supabase" -or $techs -contains "firebase"
+    $hasQA = $qaStack.Count -gt 0
 
     foreach ($skill in $AvailableSkills) {
         $skillId = $skill.Id.ToLower()
         $pack = $skill.Pack.ToLower()
         $score = 0
-        $reason = ""
+        $reasons = [System.Collections.Generic.List[string]]::new()
 
-        # 1. Tech-specific matching
+        # =====================
+        # 1. Flutter / Dart Match
+        # =====================
         if ($isFlutter) {
             if ($skillId -like "*flutter*" -or $skillId -like "*dart*" -or $skillId -eq "mobile-developer") {
                 $score += 40
-                $reason = "Matches Flutter/Dart mobile tech stack"
+                $reasons.Add("Flutter/Dart mobile project detected")
             }
-            # Exclude conflicting web/python frameworks
             if ($pack -like "*python*" -or $pack -like "*nodejs*" -or $skillId -like "*react*" -or $skillId -like "*fastapi*") {
                 continue
             }
         }
+        # =====================
+        # 2. React / Web Match
+        # =====================
         elseif ($isReact) {
             if ($skillId -like "*frontend*" -or $skillId -like "*ui_ux*" -or $skillId -like "*web_performance*" -or $skillId -eq "enhance_ui") {
                 $score += 40
-                $reason = "Matches React/Web frontend tech stack"
+                $reasons.Add("React/Web frontend project detected")
             }
-            # Exclude flutter/dart
             if ($skillId -like "*flutter*" -or $skillId -like "*dart*") {
                 continue
             }
         }
+        # =====================
+        # 3. Python Backend Match
+        # =====================
         elseif ($isPython) {
             if ($pack -like "*python*" -or $skillId -like "*python*" -or $skillId -like "*fastapi*") {
                 $score += 40
-                $reason = "Matches Python backend tech stack"
+                $reasons.Add("Python backend project detected")
             }
-            # Exclude frontend mobile/web specifics
             if ($skillId -like "*flutter*" -or $skillId -like "*dart*" -or $skillId -like "*react*") {
                 continue
             }
         }
 
-        # 2. General High-Value Architectural & QA Skills
+        # =====================
+        # 4. Universal Quality Skills
+        # =====================
         if ($skillId -in @("debug_issue", "code_review", "architect-review", "api-design-principles", "error-handling-patterns")) {
             $score += 20
-            if (-not $reason) { $reason = "Universal software quality & debugging standard" }
+            if ($reasons.Count -eq 0) { $reasons.Add("Universal software quality standard") }
         }
 
-        # 3. Backend general patterns
+        # =====================
+        # 5. Backend Architecture Boost
+        # =====================
         if ($skillId -in @("architecture-patterns", "backend-architect", "backend-security-coder", "security_audit")) {
-            if ($isPython -or $isNode -or $techs -contains "supabase") {
+            if ($hasBackend -or $hasDatabase) {
                 $score += 25
-                if (-not $reason) { $reason = "Backend architecture and security reinforcement" }
+                if ($reasons.Count -eq 0) { $reasons.Add("Backend architecture detected") }
             }
         }
 
+        # =====================
+        # 6. Full-Stack Boost
+        # =====================
+        if ($isFullStack -and $skillId -like "*full-stack*") {
+            $score += 15
+            $reasons.Add("Full-stack application detected")
+        }
+
+        # =====================
+        # 7. QA/Testing Boost
+        # =====================
+        if ($hasQA) {
+            if ($skillId -like "*test*" -or $skillId -like "*scaffold_tests*" -or $skillId -eq "test_runner") {
+                $score += 10
+                $reasons.Add("Testing tooling detected in project")
+            }
+        }
+
+        # =====================
+        # 8. Mobile-specific Boost
+        # =====================
+        if ($isMobile -and $skillId -eq "mobile-developer") {
+            $score += 15
+            $reasons.Add("Mobile application detected")
+        }
+
         if ($score -ge 30) {
+            $reasonText = ($reasons | Select-Object -Unique) -join "; "
             $recommended.Add([PSCustomObject]@{
-                SkillId    = $skill.Id
-                Pack       = $skill.Pack
-                Score      = $score
-                MatchReason = $reason
+                SkillId     = $skill.Id
+                Pack        = $skill.Pack
+                Score       = $score
+                MatchReason = $reasonText
             })
         }
     }
 
-    # Sort by score descending and return top matches (minimal overhead, max 15 skills)
+    # Sort by score descending and return top matches (max 15 skills)
     $sorted = $recommended | Sort-Object Score -Descending | Select-Object -First 15
     return @($sorted)
 }

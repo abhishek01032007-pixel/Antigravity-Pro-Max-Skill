@@ -24,6 +24,8 @@ function Show-NexoraHelp {
     Write-Host "  skills update [path]           Verify and synchronize skill versions with global registry"
     Write-Host "  doctor                         Verify runtime environment, paths, permissions, and skill health"
     Write-Host "  rollback [path]                Revert managed skills to previous backup snapshot"
+    Write-Host "  start                          Initialize application core and prepare desktop UI state"
+    Write-Host "  projects [list|add|remove]     Manage user-registered projects in global registry"
     Write-Host ""
     Write-Host "OPTIONS:" -ForegroundColor Yellow
     Write-Host "  -h, --help                     Show this help message and exit"

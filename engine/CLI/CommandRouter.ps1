@@ -7,6 +7,8 @@
 . (Join-Path $PSScriptRoot "Commands\ScanCommand.ps1")
 . (Join-Path $PSScriptRoot "Commands\UpdateCommand.ps1")
 . (Join-Path $PSScriptRoot "Commands\RollbackCommand.ps1")
+. (Join-Path $PSScriptRoot "Commands\StartCommand.ps1")
+. (Join-Path $PSScriptRoot "Commands\ProjectsCommand.ps1")
 
 function Route-NexoraCommand {
     param(
@@ -40,6 +42,8 @@ function Route-NexoraCommand {
         "scan"       { return (Invoke-ScanCommand $ParsedArgs) }
         "update"     { return (Invoke-UpdateCommand $ParsedArgs) }
         "rollback"   { return (Invoke-RollbackCommand $ParsedArgs) }
+        "start"      { return (Invoke-StartCommand $ParsedArgs) }
+        "projects"   { return (Invoke-ProjectsCommand $ParsedArgs) }
         default {
             Write-NexoraError "Unknown command '$($ParsedArgs.Command)'"
             Write-Host "Run 'nexora --help' for available commands." -ForegroundColor Yellow

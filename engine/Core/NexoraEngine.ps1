@@ -30,6 +30,12 @@ $RepoRoot = Split-Path $EngineRoot -Parent
 # Source Lifecycle Management Layer
 . (Join-Path $EngineRoot "Lifecycle\SkillLifecycleManager.ps1")
 
+# Source Application Layer (Phase 5 Application Core)
+. (Join-Path $EngineRoot "Application\ProjectRegistryService.ps1")
+. (Join-Path $EngineRoot "Application\StatusManager.ps1")
+. (Join-Path $EngineRoot "Application\MultiProjectOrchestrator.ps1")
+. (Join-Path $EngineRoot "Application\NexoraApplicationService.ps1")
+
 # Source CLI Layer
 . (Join-Path $EngineRoot "CLI\CommandParser.ps1")
 . (Join-Path $EngineRoot "CLI\CommandRouter.ps1")

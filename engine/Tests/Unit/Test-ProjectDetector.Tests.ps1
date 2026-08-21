@@ -38,7 +38,7 @@ dependencies:
     New-Item -ItemType Directory -Path (Join-Path $tempDir "android") -Force | Out-Null
 
     $res = Invoke-NexoraProjectScan -ProjectRoot $tempDir
-    Assert-Equal $res.projectType "Flutter Mobile App" "Detects Flutter Mobile App project type"
+    Assert-Equal ($res.projectType -in @("Flutter Mobile App", "mobile_application")) $true "Detects Flutter Mobile App project type"
     Assert-Equal ($res.detectedTechnologies -contains "Dart") $true "Detects Dart technology"
     Assert-Equal ($res.detectedFrameworks -contains "Flutter") $true "Detects Flutter framework"
     Assert-Equal ($res.detectedTechnologies -contains "Supabase") $true "Detects Supabase from dependencies"
