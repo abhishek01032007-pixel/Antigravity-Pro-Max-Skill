@@ -13,7 +13,8 @@ $RuntimeFolders = @(
     "Frontend-Pro-Max",
     "Fullstack-Extras",
     "Loaders",
-    "QA-Debug-Pro-Max"
+    "QA-Debug-Pro-Max",
+    "engine"
 )
 
 $RuntimeFiles = @(

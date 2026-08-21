@@ -18,7 +18,8 @@ $SkillPrefixes = @(
 
 $CorePrefixes = @(
     "Loaders/",
-    "scripts/"
+    "scripts/",
+    "engine/"
 )
 
 $CoreFiles = @(

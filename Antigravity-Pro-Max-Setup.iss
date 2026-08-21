@@ -29,6 +29,7 @@ Source: "QA-Debug-Pro-Max\*"; DestDir: "{app}\QA-Debug-Pro-Max"; Flags: ignoreve
 Source: "Fullstack-Extras\*"; DestDir: "{app}\Fullstack-Extras"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "Backend-Frameworks\*"; DestDir: "{app}\Backend-Frameworks"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "Loaders\*"; DestDir: "{app}\Loaders"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "engine\*"; DestDir: "{app}\engine"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "Start-Nexora-Skills-Manager.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Start-Antigravity-Pro-Max.bat"; DestDir: "{app}"; Flags: ignoreversion
 

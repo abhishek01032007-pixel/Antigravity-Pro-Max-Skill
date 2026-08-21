@@ -39,6 +39,7 @@ $required = @(
     "QA-Debug-Pro-Max",
     "Fullstack-Extras",
     "Loaders",
+    "engine",
     "Start-Nexora-Skills-Manager.bat",
     "Start-Antigravity-Pro-Max.bat",
     "README.md",
