@@ -1,5 +1,8 @@
 # GlobalSkillRegistry.ps1 - Global Skill Repository and Available Catalog Indexer
 
+$metaParser = Join-Path (Split-Path $PSScriptRoot -Parent) "Metadata\MetadataParser.ps1"
+if (Test-Path $metaParser) { . $metaParser }
+
 function Get-NexoraGlobalRegistry {
     param(
         [Parameter(Mandatory=$false)]

@@ -25,8 +25,10 @@ $CorePrefixes = @(
 $CoreFiles = @(
     "Start-Nexora-Skills-Manager.bat",
     "Start-Antigravity-Pro-Max.bat",
+    "Nexora-Skills-Manager-Setup.iss",
     "Antigravity-Pro-Max-Setup.iss",
     "install.ps1",
+    "uninstall.ps1",
     "setup.ps1",
     "nexora-version.json",
     "agpm-version.json"

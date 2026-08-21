@@ -1,6 +1,20 @@
+# install.ps1 - Local Direct Installer for Nexora Skills Manager
+param(
+    [string]$InstallPath = $null
+)
+
 $ErrorActionPreference = "Stop"
 
-$installPath = "C:\Antigravity Pro Max Skill"
+$LocalApp = $env:LOCALAPPDATA
+if (-not $LocalApp) { $LocalApp = Join-Path $env:USERPROFILE "AppData\Local" }
+
+if (-not $InstallPath) {
+    if ($env:NEXORA_INSTALL_PATH) {
+        $InstallPath = $env:NEXORA_INSTALL_PATH
+    } else {
+        $InstallPath = Join-Path $LocalApp "NexoraSkillsManager\runtime"
+    }
+}
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
@@ -8,30 +22,39 @@ Write-Host "         NEXORA SKILLS MANAGER" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-Write-Host "[1/4] Preparing installation..." -ForegroundColor Yellow
-
-if (-not (Test-Path $installPath)) {
-    New-Item -ItemType Directory -Path $installPath -Force | Out-Null
+Write-Host "[1/4] Preparing installation directory..." -ForegroundColor Yellow
+if (-not (Test-Path $InstallPath)) {
+    New-Item -ItemType Directory -Path $InstallPath -Force | Out-Null
 }
-
-Write-Host "      OK" -ForegroundColor Green
-
+Write-Host "      Target: $InstallPath" -ForegroundColor Green
 
 Write-Host "[2/4] Installing Nexora Skills Manager..." -ForegroundColor Yellow
-
 Get-ChildItem $PSScriptRoot -Force |
-Where-Object {
-    $_.Name -ne "install.ps1"
-} |
-ForEach-Object {
-    Copy-Item $_.FullName $installPath -Recurse -Force
-}
-
+    Where-Object { $_.Name -notin @("install.ps1", ".git", ".nexora") } |
+    ForEach-Object {
+        Copy-Item $_.FullName $InstallPath -Recurse -Force
+    }
 Write-Host "      OK" -ForegroundColor Green
 
+Write-Host "[3/4] Persisting metadata & environment..." -ForegroundColor Yellow
+$metaDir = Join-Path $LocalApp "NexoraSkillsManager"
+if (-not (Test-Path $metaDir)) { New-Item -ItemType Directory -Path $metaDir -Force | Out-Null }
+$metaFile = Join-Path $metaDir "install.json"
 
-Write-Host "[3/4] Verifying installation..." -ForegroundColor Yellow
+$meta = [PSCustomObject]@{
+    installPath   = $InstallPath
+    version       = "1.0.0"
+    engineEntry   = "engine\Core\NexoraEngine.ps1"
+    launcherBatch = "Start-Nexora-Skills-Manager.bat"
+    installedAt   = (Get-Date).ToString("o")
+    installMethod = "local_direct"
+    channel       = "stable"
+}
+$meta | ConvertTo-Json -Depth 4 | Set-Content -Path $metaFile -Encoding UTF8
 
+[Environment]::SetEnvironmentVariable("NEXORA_INSTALL_PATH", $InstallPath, "User")
+
+Write-Host "[4/4] Verifying installation..." -ForegroundColor Yellow
 $required = @(
     "Frontend-Pro-Max",
     "Backend-Pro-Max",
@@ -42,17 +65,12 @@ $required = @(
     "engine",
     "Start-Nexora-Skills-Manager.bat",
     "Start-Antigravity-Pro-Max.bat",
-    "README.md",
-    "THIRD_PARTY_NOTICES.md",
-    "third-party-licenses"
+    "README.md"
 )
 
 $failed = $false
-
 foreach ($item in $required) {
-
-    $path = Join-Path $installPath $item
-
+    $path = Join-Path $InstallPath $item
     if (-not (Test-Path $path)) {
         Write-Host "      MISSING: $item" -ForegroundColor Red
         $failed = $true
@@ -63,29 +81,9 @@ if ($failed) {
     throw "Installation verification failed."
 }
 
-Write-Host "      All required files verified." -ForegroundColor Green
-
-
-Write-Host "[4/4] Installation complete." -ForegroundColor Yellow
 Write-Host ""
-
 Write-Host "========================================" -ForegroundColor Green
 Write-Host "   NEXORA SKILLS MANAGER INSTALLED" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
+Write-Host "Installed to: $InstallPath" -ForegroundColor Cyan
 Write-Host ""
-
-Write-Host "Installed to:" -ForegroundColor White
-Write-Host "C:\Antigravity Pro Max Skill" -ForegroundColor Cyan
-Write-Host ""
-
-Write-Host "Nexora Skills Manager is ready to use." -ForegroundColor Green
-Write-Host ""
-Write-Host "No project has been changed." -ForegroundColor DarkGray
-Write-Host ""
-
-Write-Host "When you want to use it, run:" -ForegroundColor White
-Write-Host "Start-Nexora-Skills-Manager.bat" -ForegroundColor Cyan
-Write-Host "or legacy:" -ForegroundColor White
-Write-Host "Start-Antigravity-Pro-Max.bat" -ForegroundColor Yellow
-Write-Host ""
-

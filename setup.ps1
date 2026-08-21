@@ -1,83 +1,29 @@
+# setup.ps1 - Nexora Skills Manager Universal Windows Bootstrap Installer
+param(
+    [string]$InstallPath = $null,
+    [switch]$NonInteractive
+)
+
 $ErrorActionPreference = "Stop"
 
 $RepoOwner = "abhishek01032007-pixel"
-$RepoName  = "Antigravity-Pro-Max-Skill"
-$Branch    = "main"
+$RepoName  = "Nexora-Skills-Manager"
+$DefaultBranch = "main"
 
-$DefaultInstallPath = "C:\Antigravity Pro Max Skill"
-$CommandBin = Join-Path $env:LOCALAPPDATA "AntigravityProMax\bin"
+$LocalApp = $env:LOCALAPPDATA
+if (-not $LocalApp) { $LocalApp = Join-Path $env:USERPROFILE "AppData\Local" }
 
-$RuntimeFolders = @(
-    "Backend-Frameworks",
-    "Backend-Pro-Max",
-    "Frontend-Pro-Max",
-    "Fullstack-Extras",
-    "Loaders",
-    "QA-Debug-Pro-Max",
-    "engine"
-)
+$DefaultInstallPath = Join-Path $LocalApp "NexoraSkillsManager\runtime"
+$NexoraBinDir = Join-Path $LocalApp "NexoraSkillsManager\bin"
+$LegacyBinDir = Join-Path $LocalApp "AntigravityProMax\bin"
 
-$RuntimeFiles = @(
-    "Start-Nexora-Skills-Manager.bat",
-    "Start-Antigravity-Pro-Max.bat"
-)
-
-$NonRuntimeItems = @(
-    "README.md",
-    "LICENSE",
-    "THIRD_PARTY_NOTICES.md",
-    "third-party-licenses",
-    "install.ps1",
-    "setup.ps1",
-    ".gitignore",
-    "agpm.cmd",
-    "nexora.cmd",
-    "nexora-version.json",
-    "agpm-version.json"
-)
-
-$TempRoot = Join-Path $env:TEMP ("nexora-" + [guid]::NewGuid().ToString("N"))
-$ZipPath  = Join-Path $TempRoot "source.zip"
-$Extract  = Join-Path $TempRoot "source"
-
-function Remove-Temp {
-    if (Test-Path $TempRoot) {
-        Remove-Item $TempRoot -Recurse -Force -ErrorAction SilentlyContinue
-    }
-}
+$TempRoot = Join-Path $env:TEMP ("nexora-bootstrap-" + [guid]::NewGuid().ToString("N"))
+$ZipPath  = Join-Path $TempRoot "release.zip"
+$Extract  = Join-Path $TempRoot "extracted"
 
 function Write-Step {
-    param(
-        [string]$Step,
-        [string]$Message
-    )
-
+    param([string]$Step, [string]$Message)
     Write-Host "[$Step] $Message" -ForegroundColor Cyan
-}
-
-function Find-ExistingRuntime {
-    foreach ($letter in [char[]]([char]'C'..[char]'Z')) {
-        $candidateNexora = "$letter`:\Nexora Skills Manager"
-        if (
-            (Test-Path $candidateNexora) -and
-            (Test-Path (Join-Path $candidateNexora "Start-Nexora-Skills-Manager.bat"))
-        ) {
-            return $candidateNexora
-        }
-
-        $candidate = "$letter`:\Antigravity Pro Max Skill"
-        if (
-            (Test-Path $candidate) -and
-            (
-                (Test-Path (Join-Path $candidate "Start-Nexora-Skills-Manager.bat")) -or
-                (Test-Path (Join-Path $candidate "Start-Antigravity-Pro-Max.bat"))
-            )
-        ) {
-            return $candidate
-        }
-    }
-
-    return $null
 }
 
 try {
@@ -87,305 +33,183 @@ try {
     Write-Host "==============================================" -ForegroundColor Green
     Write-Host ""
 
-    Write-Step "1/7" "Detecting installation"
-
-    if ($env:NEXORA_INSTALL_PATH) {
-        $InstallPath = $env:NEXORA_INSTALL_PATH
-        Write-Host "      Custom location detected (NEXORA_INSTALL_PATH)" -ForegroundColor Green
+    # 1. Target Directory Resolution
+    Write-Step "1/6" "Resolving installation directory..."
+    if ($InstallPath) {
+        # Explicit parameter provided
+        Write-Host "      Custom path specified: $InstallPath" -ForegroundColor Green
     }
-    elseif ($env:AGPM_INSTALL_PATH) {
-        $InstallPath = $env:AGPM_INSTALL_PATH
-        Write-Host "      Legacy location detected (AGPM_INSTALL_PATH)" -ForegroundColor Green
+    elseif ($env:NEXORA_INSTALL_PATH) {
+        $InstallPath = $env:NEXORA_INSTALL_PATH
+        Write-Host "      Using NEXORA_INSTALL_PATH: $InstallPath" -ForegroundColor Green
     }
     else {
-        $ExistingRuntime = Find-ExistingRuntime
-
-        if ($ExistingRuntime) {
-            $InstallPath = $ExistingRuntime
-            Write-Host "      Existing runtime found" -ForegroundColor Green
-        }
-        else {
-            $InstallPath = $DefaultInstallPath
-            Write-Host "      Using default location" -ForegroundColor Green
-        }
+        $InstallPath = $DefaultInstallPath
+        Write-Host "      Default location: $InstallPath" -ForegroundColor Green
     }
 
-    Write-Host "      $InstallPath" -ForegroundColor DarkGray
-
-
-    Write-Step "2/7" "Preparing download"
-
+    # 2. Prepare Temp Staging
+    Write-Step "2/6" "Preparing release download..."
     New-Item -ItemType Directory -Path $TempRoot -Force | Out-Null
     New-Item -ItemType Directory -Path $Extract -Force | Out-Null
 
-    $DownloadUrl =
-        "https://github.com/$RepoOwner/$RepoName/archive/refs/heads/$Branch.zip"
-
-    Write-Host "      Ready" -ForegroundColor Green
-
-
-    Write-Step "3/7" "Downloading Nexora Skills Manager"
+    # 3. Download Release Archive from GitHub
+    Write-Step "3/6" "Downloading latest verified release..."
+    $DownloadUrl = "https://github.com/$RepoOwner/$RepoName/archive/refs/heads/$DefaultBranch.zip"
 
     Invoke-WebRequest `
         -Uri $DownloadUrl `
         -OutFile $ZipPath `
         -UseBasicParsing
 
-    Write-Host "      Downloaded" -ForegroundColor Green
+    Write-Host "      Downloaded package successfully" -ForegroundColor Green
 
-
-    Write-Step "4/7" "Preparing runtime"
-
-    Expand-Archive `
-        -Path $ZipPath `
-        -DestinationPath $Extract `
-        -Force
+    # 4. Extract and Deploy Runtime
+    Write-Step "4/6" "Deploying Nexora Core Engine & Universal Skills..."
+    Expand-Archive -Path $ZipPath -DestinationPath $Extract -Force
 
     $Source = Get-ChildItem $Extract -Directory |
-        Where-Object { $_.Name -like "$RepoName-*" -or $_.Name -like "Nexora-Skills-Manager-*" } |
+        Where-Object { $_.Name -like "$RepoName-*" -or $_.Name -like "Antigravity-Pro-Max-*" } |
         Select-Object -First 1
 
     if (-not $Source) {
-        throw "Downloaded repository package could not be located."
+        throw "Extracted release archive structure is invalid."
     }
 
-    foreach ($folder in $RuntimeFolders) {
-        if (-not (Test-Path (Join-Path $Source.FullName $folder))) {
-            throw "Required runtime folder missing: $folder"
+    if (-not (Test-Path $InstallPath)) {
+        New-Item -ItemType Directory -Path $InstallPath -Force | Out-Null
+    }
+
+    $RuntimeFolders = @("engine", "Loaders", "Frontend-Pro-Max", "Backend-Pro-Max", "QA-Debug-Pro-Max", "Fullstack-Extras", "Backend-Frameworks")
+    foreach ($f in $RuntimeFolders) {
+        $srcDir = Join-Path $Source.FullName $f
+        $dstDir = Join-Path $InstallPath $f
+        if (Test-Path $srcDir) {
+            if (Test-Path $dstDir) { Remove-Item -Path $dstDir -Recurse -Force -ErrorAction SilentlyContinue }
+            Copy-Item -Path $srcDir -Destination $dstDir -Recurse -Force
         }
     }
 
-    foreach ($file in $RuntimeFiles) {
-        if (-not (Test-Path (Join-Path $Source.FullName $file))) {
-            throw "Required runtime file missing: $file"
+    $RuntimeFiles = @("Start-Nexora-Skills-Manager.bat", "Start-Antigravity-Pro-Max.bat", "nexora-version.json", "agpm-version.json", "README.md", "LICENSE")
+    foreach ($rf in $RuntimeFiles) {
+        $srcFile = Join-Path $Source.FullName $rf
+        if (Test-Path $srcFile) {
+            Copy-Item -Path $srcFile -Destination (Join-Path $InstallPath $rf) -Force
         }
     }
 
-    Write-Host "      Runtime verified" -ForegroundColor Green
-
-
-    Write-Step "5/7" "Installing skill packs"
-
-    New-Item `
-        -ItemType Directory `
-        -Path $InstallPath `
-        -Force |
-        Out-Null
-
-    foreach ($item in $NonRuntimeItems) {
-        $path = Join-Path $InstallPath $item
-
-        if (Test-Path $path) {
-            Remove-Item $path -Recurse -Force
-        }
+    # 5. Persist Authoritative Metadata & Environment Variables
+    Write-Step "5/6" "Persisting installation records & commands..."
+    
+    # Save install.json
+    $metaDir = Join-Path $LocalApp "NexoraSkillsManager"
+    if (-not (Test-Path $metaDir)) { New-Item -ItemType Directory -Path $metaDir -Force | Out-Null }
+    $metaFile = Join-Path $metaDir "install.json"
+    
+    $meta = [PSCustomObject]@{
+        installPath   = $InstallPath
+        version       = "1.0.0"
+        engineEntry   = "engine\Core\NexoraEngine.ps1"
+        launcherBatch = "Start-Nexora-Skills-Manager.bat"
+        installedAt   = (Get-Date).ToString("o")
+        installMethod = "one_line_powershell"
+        channel       = "stable"
     }
+    $meta | ConvertTo-Json -Depth 4 | Set-Content -Path $metaFile -Encoding UTF8
 
-    foreach ($folder in $RuntimeFolders) {
-        $src = Join-Path $Source.FullName $folder
-        $dst = Join-Path $InstallPath $folder
+    # Set fast user environment variable
+    [Environment]::SetEnvironmentVariable("NEXORA_INSTALL_PATH", $InstallPath, "User")
+    $env:NEXORA_INSTALL_PATH = $InstallPath
 
-        if (Test-Path $dst) {
-            Remove-Item $dst -Recurse -Force
-        }
+    # Create command shims
+    if (-not (Test-Path $NexoraBinDir)) { New-Item -ItemType Directory -Path $NexoraBinDir -Force | Out-Null }
 
-        Copy-Item `
-            -Path $src `
-            -Destination $dst `
-            -Recurse `
-            -Force
-    }
+    $nexoraCmdContent = @'
+@echo off
+setlocal EnableExtensions
 
-    foreach ($file in $RuntimeFiles) {
-        Copy-Item `
-            -Path (Join-Path $Source.FullName $file) `
-            -Destination (Join-Path $InstallPath $file) `
-            -Force
-    }
+if defined NEXORA_INSTALL_PATH if exist "%NEXORA_INSTALL_PATH%\Start-Nexora-Skills-Manager.bat" (
+    call "%NEXORA_INSTALL_PATH%\Start-Nexora-Skills-Manager.bat" %*
+    exit /b %ERRORLEVEL%
+)
 
-    Write-Host "      Runtime installed" -ForegroundColor Green
+set "META=%LOCALAPPDATA%\NexoraSkillsManager\install.json"
+if exist "%META%" (
+    for /f "usebackq delims=" %%I in (`powershell -NoProfile -Command "(Get-Content '%META%' -Raw | ConvertFrom-Json).installPath"`) do set "NEXORA_INSTALL_PATH=%%I"
+)
 
+if defined NEXORA_INSTALL_PATH if exist "%NEXORA_INSTALL_PATH%\Start-Nexora-Skills-Manager.bat" (
+    call "%NEXORA_INSTALL_PATH%\Start-Nexora-Skills-Manager.bat" %*
+    exit /b %ERRORLEVEL%
+)
 
-    Write-Step "6/7" "Installing Nexora and legacy AGPM commands"
-
-    New-Item `
-        -ItemType Directory `
-        -Path $CommandBin `
-        -Force |
-        Out-Null
-
-    $NexoraLines = @(
-        '@echo off',
-        'setlocal EnableExtensions',
-        '',
-        'for %%D in (C D E F G H I J K L M N O P Q R S T U V W X Y Z) do (',
-        '    if exist "%%D:\Nexora Skills Manager\Start-Nexora-Skills-Manager.bat" (',
-        '        call "%%D:\Nexora Skills Manager\Start-Nexora-Skills-Manager.bat" %*',
-        '        exit /b %ERRORLEVEL%',
-        '    )',
-        '    if exist "%%D:\Antigravity Pro Max Skill\Start-Nexora-Skills-Manager.bat" (',
-        '        call "%%D:\Antigravity Pro Max Skill\Start-Nexora-Skills-Manager.bat" %*',
-        '        exit /b %ERRORLEVEL%',
-        '    )',
-        '    if exist "%%D:\Antigravity Pro Max Skill\Start-Antigravity-Pro-Max.bat" (',
-        '        call "%%D:\Antigravity Pro Max Skill\Start-Antigravity-Pro-Max.bat" %*',
-        '        exit /b %ERRORLEVEL%',
-        '    )',
-        ')',
-        '',
-        'echo.',
-        'echo ========================================',
-        'echo      NEXORA SKILLS MANAGER NOT FOUND',
-        'echo ========================================',
-        'echo.',
-        'echo Expected runtime folder:',
-        'echo   ^<Drive^>:\Antigravity Pro Max Skill',
-        'echo.',
-        'echo Run the installer again if the folder was removed.',
-        'echo.',
-        'pause',
-        'exit /b 1'
+for %%D in (C D E F G H I J K L M N O P Q R S T U V W X Y Z) do (
+    if exist "%%D:\Nexora Skills Manager\Start-Nexora-Skills-Manager.bat" (
+        call "%%D:\Nexora Skills Manager\Start-Nexora-Skills-Manager.bat" %*
+        exit /b %ERRORLEVEL%
     )
-
-    Set-Content `
-        -Path (Join-Path $CommandBin "nexora.cmd") `
-        -Value $NexoraLines `
-        -Encoding ASCII
-
-    $AgpmLines = @(
-        '@echo off',
-        'setlocal EnableExtensions',
-        '',
-        'echo.',
-        'echo ===============================================================================',
-        'echo  [NOTICE] The ''agpm'' command has transitioned to ''nexora'' (Nexora Skills Manager).',
-        'echo           Please use ''nexora'' in the future. Forwarding command...',
-        'echo ===============================================================================',
-        'echo.',
-        '',
-        'if exist "%~dp0nexora.cmd" (',
-        '    call "%~dp0nexora.cmd" %*',
-        '    exit /b %ERRORLEVEL%',
-        ')',
-        '',
-        'for %%D in (C D E F G H I J K L M N O P Q R S T U V W X Y Z) do (',
-        '    if exist "%%D:\Antigravity Pro Max Skill\Start-Nexora-Skills-Manager.bat" (',
-        '        call "%%D:\Antigravity Pro Max Skill\Start-Nexora-Skills-Manager.bat" %*',
-        '        exit /b %ERRORLEVEL%',
-        '    )',
-        '    if exist "%%D:\Antigravity Pro Max Skill\Start-Antigravity-Pro-Max.bat" (',
-        '        call "%%D:\Antigravity Pro Max Skill\Start-Antigravity-Pro-Max.bat" %*',
-        '        exit /b %ERRORLEVEL%',
-        '    )',
-        ')',
-        '',
-        'echo.',
-        'echo ========================================',
-        'echo      NEXORA SKILLS MANAGER NOT FOUND',
-        'echo ========================================',
-        'echo.',
-        'echo Expected runtime folder:',
-        'echo   ^<Drive^>:\Antigravity Pro Max Skill',
-        'echo.',
-        'echo Run the installer again if the folder was removed.',
-        'echo.',
-        'pause',
-        'exit /b 1'
+    if exist "%%D:\Antigravity Pro Max Skill\Start-Nexora-Skills-Manager.bat" (
+        call "%%D:\Antigravity Pro Max Skill\Start-Nexora-Skills-Manager.bat" %*
+        exit /b %ERRORLEVEL%
     )
+)
 
-    Set-Content `
-        -Path (Join-Path $CommandBin "agpm.cmd") `
-        -Value $AgpmLines `
-        -Encoding ASCII
+echo [ERROR] Nexora Skills Manager runtime could not be located.
+echo Please run the setup script again to repair your installation.
+exit /b 1
+'@
 
-    $UserPath =
-        [Environment]::GetEnvironmentVariable(
-            "Path",
-            [EnvironmentVariableTarget]::User
-        )
+    Set-Content -Path (Join-Path $NexoraBinDir "nexora.cmd") -Value $nexoraCmdContent -Encoding ASCII
 
-    $UserParts = @(
-        $UserPath -split ";" |
-        Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
-    )
+    $agpmCmdContent = @'
+@echo off
+setlocal EnableExtensions
+echo.
+echo ===============================================================================
+echo  [NOTICE] The 'agpm' command has transitioned to 'nexora' (Nexora Skills Manager).
+echo           Please use 'nexora' in the future. Forwarding command...
+echo ===============================================================================
+echo.
+call "%~dp0\nexora.cmd" %*
+exit /b %ERRORLEVEL%
+'@
 
-    if ($UserParts -notcontains $CommandBin) {
-        $NewUserPath = (($UserParts + $CommandBin) -join ";")
+    Set-Content -Path (Join-Path $NexoraBinDir "agpm.cmd") -Value $agpmCmdContent -Encoding ASCII
 
-        [Environment]::SetEnvironmentVariable(
-            "Path",
-            $NewUserPath,
-            [EnvironmentVariableTarget]::User
-        )
+    # If legacy bin folder exists, update it too for backward compatibility
+    if (Test-Path $LegacyBinDir) {
+        Set-Content -Path (Join-Path $LegacyBinDir "nexora.cmd") -Value $nexoraCmdContent -Encoding ASCII
+        Set-Content -Path (Join-Path $LegacyBinDir "agpm.cmd") -Value $agpmCmdContent -Encoding ASCII
     }
 
-    $CurrentParts = @(
-        $env:Path -split ";" |
-        Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
-    )
-
-    if ($CurrentParts -notcontains $CommandBin) {
-        $env:Path = $env:Path.TrimEnd(";") + ";" + $CommandBin
+    # Register NexoraBinDir in User PATH
+    $UserPath = [Environment]::GetEnvironmentVariable("Path", "User")
+    if ($UserPath -notlike "*$NexoraBinDir*") {
+        $NewPath = if ($UserPath) { "$UserPath;$NexoraBinDir" } else { $NexoraBinDir }
+        [Environment]::SetEnvironmentVariable("Path", $NewPath, "User")
+        $env:Path = "$env:Path;$NexoraBinDir"
     }
 
-    Write-Host "      Command ready: nexora (and legacy agpm)" -ForegroundColor Green
-
-
-    Write-Step "7/7" "Final verification"
-
-    foreach ($folder in $RuntimeFolders) {
-        if (-not (Test-Path (Join-Path $InstallPath $folder))) {
-            throw "Verification failed: $folder"
-        }
+    # 6. Verification
+    Write-Step "6/6" "Verifying installation integrity..."
+    $engineEntry = Join-Path $InstallPath "engine\Core\NexoraEngine.ps1"
+    if (-not (Test-Path $engineEntry)) {
+        throw "Engine entrypoint missing: $engineEntry"
     }
-
-    foreach ($file in $RuntimeFiles) {
-        if (-not (Test-Path (Join-Path $InstallPath $file))) {
-            throw "Verification failed: $file"
-        }
-    }
-
-    if (-not (Test-Path (Join-Path $CommandBin "nexora.cmd"))) {
-        throw "Verification failed: nexora command."
-    }
-
-    if (-not (Test-Path (Join-Path $CommandBin "agpm.cmd"))) {
-        throw "Verification failed: agpm command."
-    }
-
-    Remove-Temp
 
     Write-Host ""
     Write-Host "==============================================" -ForegroundColor Green
-    Write-Host "          NEXORA SKILLS MANAGER READY" -ForegroundColor Green
+    Write-Host "     NEXORA SKILLS MANAGER INSTALLED!" -ForegroundColor Green
     Write-Host "==============================================" -ForegroundColor Green
     Write-Host ""
-    Write-Host "Installed at:" -ForegroundColor White
-    Write-Host "  $InstallPath" -ForegroundColor Cyan
+    Write-Host "Installation Path: $InstallPath" -ForegroundColor White
+    Write-Host "Command Registered: nexora (and legacy agpm)" -ForegroundColor White
     Write-Host ""
-    Write-Host "Start Nexora Skills Manager with:" -ForegroundColor White
-    Write-Host ""
-    Write-Host "  nexora" -ForegroundColor Cyan
-    Write-Host ""
-    Write-Host "Legacy 'agpm' command is also enabled for compatibility." -ForegroundColor Yellow
-    Write-Host ""
-    Write-Host "No Antigravity project was selected or modified." `
-        -ForegroundColor DarkGray
+    Write-Host "Open a new terminal and type: nexora" -ForegroundColor Yellow
     Write-Host ""
 }
-catch {
-    Remove-Temp
-
-    Write-Host ""
-    Write-Host "==============================================" -ForegroundColor Red
-    Write-Host "             INSTALLATION FAILED" -ForegroundColor Red
-    Write-Host "==============================================" -ForegroundColor Red
-    Write-Host ""
-    Write-Host $_.Exception.Message -ForegroundColor Red
-    Write-Host ""
-
-    exit 1
+finally {
+    if (Test-Path $TempRoot) {
+        Remove-Item -Path $TempRoot -Recurse -Force -ErrorAction SilentlyContinue
+    }
 }
-
-
-
-
