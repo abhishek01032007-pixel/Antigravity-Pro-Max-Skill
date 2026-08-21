@@ -1,4 +1,4 @@
-# CopilotAdapter.ps1 - GitHub Copilot Instruction Aggregator
+# CopilotAdapter.ps1 - GitHub Copilot Instruction Aggregator & Remover
 
 function Deploy-CopilotSkills {
     param(
@@ -38,4 +38,18 @@ function Deploy-CopilotSkills {
         TargetDirectory = $githubDir
         DeployedSkills = $deployed.ToArray()
     }
+}
+
+function Undeploy-CopilotSkills {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$ProjectRoot,
+        [Parameter(Mandatory=$true)]
+        [string[]]$SkillIds,
+        [Parameter(Mandatory=$false)]
+        [array]$RemainingSkillObjects = @()
+    )
+
+    # Re-generate copilot instructions with only remaining active skills
+    return (Deploy-CopilotSkills -ProjectRoot $ProjectRoot -SkillObjects $RemainingSkillObjects)
 }

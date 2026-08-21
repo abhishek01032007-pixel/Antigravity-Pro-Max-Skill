@@ -1,4 +1,4 @@
-# AntigravityAdapter.ps1 - Native Google Antigravity Skill Deployer
+# AntigravityAdapter.ps1 - Native Google Antigravity Skill Deployer & Undeployer
 
 function Deploy-AntigravitySkills {
     param(
@@ -27,5 +27,31 @@ function Deploy-AntigravitySkills {
         Platform = "Antigravity"
         TargetDirectory = $targetDir
         DeployedSkills = $deployed.ToArray()
+    }
+}
+
+function Undeploy-AntigravitySkills {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$ProjectRoot,
+        [Parameter(Mandatory=$true)]
+        [string[]]$SkillIds
+    )
+
+    $targetDir = Join-Path $ProjectRoot ".agents\skills"
+    $removed = [System.Collections.Generic.List[string]]::new()
+
+    foreach ($id in $SkillIds) {
+        $dest = Join-Path $targetDir $id
+        if (Test-Path $dest) {
+            Remove-Item -Path $dest -Recurse -Force -ErrorAction SilentlyContinue
+            $removed.Add($id)
+        }
+    }
+
+    return [PSCustomObject]@{
+        Platform = "Antigravity"
+        TargetDirectory = $targetDir
+        RemovedSkills = $removed.ToArray()
     }
 }

@@ -1,4 +1,4 @@
-# CursorAdapter.ps1 - Cursor IDE Rule Compiler
+# CursorAdapter.ps1 - Cursor IDE Rule Compiler & Remover
 
 function Deploy-CursorSkills {
     param(
@@ -28,5 +28,31 @@ function Deploy-CursorSkills {
         Platform = "Cursor"
         TargetDirectory = $cursorDir
         DeployedSkills = $deployed.ToArray()
+    }
+}
+
+function Undeploy-CursorSkills {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$ProjectRoot,
+        [Parameter(Mandatory=$true)]
+        [string[]]$SkillIds
+    )
+
+    $cursorDir = Join-Path $ProjectRoot ".cursor\rules"
+    $removed = [System.Collections.Generic.List[string]]::new()
+
+    foreach ($id in $SkillIds) {
+        $destFile = Join-Path $cursorDir "$id.mdc"
+        if (Test-Path $destFile) {
+            Remove-Item -Path $destFile -Force -ErrorAction SilentlyContinue
+            $removed.Add($id)
+        }
+    }
+
+    return [PSCustomObject]@{
+        Platform = "Cursor"
+        TargetDirectory = $cursorDir
+        RemovedSkills = $removed.ToArray()
     }
 }

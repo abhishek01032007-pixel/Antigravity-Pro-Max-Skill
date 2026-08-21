@@ -1,4 +1,4 @@
-﻿# Local / development files
+# Local / development files
 Test-Project/
 Backup/
 
@@ -11,6 +11,7 @@ Backup/
 .agent/
 .gemini/
 .agy-skills.json
+.nexora/
 
 # Credentials / secrets
 .env

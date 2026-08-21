@@ -132,6 +132,7 @@ function Get-NexoraProjectSkills {
         activeSkills       = @()
         recommendedSkills  = @()
         userSelections     = @()
+        deactivatedSkills  = @()
         lastModified       = (Get-Date).ToString("o")
     }
 }
