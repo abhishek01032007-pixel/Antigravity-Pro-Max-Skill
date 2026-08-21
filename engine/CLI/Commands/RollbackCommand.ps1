@@ -1,4 +1,4 @@
-# RollbackCommand.ps1 - State Snapshot Restorer Hook
+# RollbackCommand.ps1 - State Snapshot Restorer
 
 function Invoke-RollbackCommand {
     param(
@@ -9,11 +9,18 @@ function Invoke-RollbackCommand {
     $resolved = Resolve-NexoraPath $targetPath
 
     Write-NexoraBanner
-    Write-Host "Rollback state for: $resolved" -ForegroundColor Yellow
-    Write-Host ""
-    Write-NexoraInfo "Checking snapshot archives in .nexora/backups/..."
-    Write-NexoraSuccess "No previous uncommitted snapshot detected. Workspace is clean."
+    Write-Host "Rollback Operation for: $resolved" -ForegroundColor Yellow
     Write-Host ""
 
-    return 0
+    $snapshotId = if ($ParsedArgs.Flags.ContainsKey("snapshot")) { $ParsedArgs.Flags["snapshot"] } else { $null }
+    $res = Restore-NexoraSnapshot -ProjectRoot $resolved -SnapshotId $snapshotId
+
+    if ($res.success) {
+        Write-NexoraSuccess "$($res.message)"
+        return 0
+    }
+    else {
+        Write-NexoraWarn "$($res.message)"
+        return 0
+    }
 }

@@ -20,6 +20,12 @@ $RepoRoot = Split-Path $EngineRoot -Parent
 . (Join-Path $EngineRoot "Storage\ProjectMemory.ps1")
 . (Join-Path $EngineRoot "Storage\SkillRegistry.ps1")
 
+# Source Intelligence, Detection & Adapters
+. (Join-Path $EngineRoot "Detection\ProjectDetector.ps1")
+. (Join-Path $EngineRoot "Metadata\MetadataParser.ps1")
+. (Join-Path $EngineRoot "Recommendations\RecommendationEngine.ps1")
+. (Join-Path $EngineRoot "Adapters\PlatformAdapter.ps1")
+
 # Source CLI Layer
 . (Join-Path $EngineRoot "CLI\CommandParser.ps1")
 . (Join-Path $EngineRoot "CLI\CommandRouter.ps1")
