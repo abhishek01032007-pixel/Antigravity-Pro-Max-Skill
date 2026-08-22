@@ -9,7 +9,7 @@ Nexora Skills Manager v1.0.0 introduces a local-first desktop application and un
 - **Native Windows Desktop Host**: Electron-based control center with dark mode, real-time health indicators, and high-contrast responsive layouts.
 - **Deep Project Intelligence**: Scans and identifies frameworks, languages, and architecture markers without transmitting source code off-machine.
 - **Role-Based Working Modes**: Dedicated engineering modes (Frontend, Backend, QA/Debug, Fullstack) with contextual development targets.
-- **Curated Engineering Library**: 48+ role-specific skills spanning Flutter, FastAPI, Node.js, Clean Architecture, Security, and Testing.
+- **Curated Engineering Library**: 48 role-specific skills spanning Flutter, FastAPI, Node.js, Clean Architecture, Security, and Testing.
 - **Multi-Platform Skill Deployment**: Automatically outputs structured skill instructions to Google Antigravity (`.agents/skills/`), Cursor (`.cursor/rules/`), and GitHub Copilot (`.github/copilot-instructions.md`).
 - **Unified Windows CLI (`nexora`)**: Instant terminal access for interactive skill management, scanning, and runtime health diagnostics with legacy `agpm` forwarder.
 - **Secure Remote Update System**: Cryptographic SHA-256 verification, HTTPS downloads from trusted GitHub releases, parameterless bridge invocations, and automatic rollback on installation fault.
