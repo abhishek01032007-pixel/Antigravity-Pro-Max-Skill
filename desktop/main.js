@@ -68,12 +68,16 @@ async function createWindow() {
   registerBridgeIpc(processHost);
 
   // 3. Create secure BrowserWindow
+  const devIconPath = path.join(__dirname, '..', 'assets', 'branding', 'NexoraSkillsManager.ico');
+  const windowIcon = fs.existsSync(devIconPath) ? devIconPath : undefined;
+
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 900,
     minWidth: 1200,
     minHeight: 720,
     title: 'Nexora Skills Manager',
+    icon: windowIcon,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
