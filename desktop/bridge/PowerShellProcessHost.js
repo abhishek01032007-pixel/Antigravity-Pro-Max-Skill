@@ -11,6 +11,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const { getOperationMeta, isValidOperation, TIMEOUT_CLASSES } = require('../registry/operations');
+const { resolveNexoraRuntime } = require('./runtime-resolver');
 
 class PowerShellProcessHost {
   constructor(options = {}) {
@@ -24,8 +25,11 @@ class PowerShellProcessHost {
     this.restartCount = 0;
     this.debug = options.debug || false;
 
-    // Fixed trusted script path
-    this.scriptPath = path.resolve(__dirname, 'NexoraDesktopBridgeHost.ps1');
+    // Resolve authoritative runtime paths (supports dependency injection for testing)
+    this.runtimeDescriptor = options.runtimeDescriptor || resolveNexoraRuntime(options);
+    this.scriptPath = options.scriptPath || (this.runtimeDescriptor && this.runtimeDescriptor.bridgeEntry) || path.resolve(__dirname, 'NexoraDesktopBridgeHost.ps1');
+    this.engineRoot = options.engineRoot || (this.runtimeDescriptor && this.runtimeDescriptor.engineRoot) || null;
+    this.runtimeRoot = options.runtimeRoot || (this.runtimeDescriptor && this.runtimeDescriptor.runtimeRoot) || null;
   }
 
   /**
@@ -69,7 +73,9 @@ class PowerShellProcessHost {
 
     if (!fs.existsSync(this.scriptPath)) {
       this.isStarting = false;
-      throw new Error(`Nexora bridge script not found at ${this.scriptPath}`);
+      const err = new Error(`Nexora bridge script not found at ${this.scriptPath}`);
+      err.code = 'RUNTIME_BRIDGE_MISSING';
+      throw err;
     }
 
     const args = [
@@ -79,14 +85,25 @@ class PowerShellProcessHost {
       '-File', this.scriptPath
     ];
 
+    const workerEnv = {
+      ...process.env,
+      ...(this.options.env || {}),
+      PSExecutionPolicyPreference: 'Bypass',
+      NEXORA_RUNTIME_MODE: (this.runtimeDescriptor && this.runtimeDescriptor.mode) || this.options.mode || 'development'
+    };
+
+    if (this.engineRoot) {
+      workerEnv.NEXORA_ENGINE_ROOT = this.engineRoot;
+    }
+    if (this.runtimeRoot) {
+      workerEnv.NEXORA_RUNTIME_ROOT = this.runtimeRoot;
+    }
+
     try {
       this.child = spawn(psExecutable, args, {
         stdio: ['pipe', 'pipe', 'pipe'],
         windowsHide: true,
-        env: {
-          ...process.env,
-          PSExecutionPolicyPreference: 'Bypass'
-        }
+        env: workerEnv
       });
 
       this.child.stdout.setEncoding('utf8');

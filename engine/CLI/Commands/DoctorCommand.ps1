@@ -14,11 +14,12 @@ function Invoke-DoctorCommand {
     $runtimePath = Resolve-NexoraInstalledRuntimePath
     $meta = Get-NexoraInstallationMetadata
 
-    $hasMeta = ($null -ne $meta -and (Test-Path $meta.installPath))
+    $metaInstallPath = if ($meta) { if ($meta.PSObject.Properties["installPath"] -and $meta.installPath) { $meta.installPath } elseif ($meta.PSObject.Properties["runtimeRoot"] -and $meta.runtimeRoot) { $meta.runtimeRoot } else { $null } } else { $null }
+    $hasMeta = ($null -ne $metaInstallPath -and (Test-Path -LiteralPath $metaInstallPath))
     $checks.Add([PSCustomObject]@{
         Name   = "Installation Metadata"
         Status = if ($hasMeta) { "OK" } else { "WARN" }
-        Detail = if ($hasMeta) { "Resolved via install.json: $($meta.installPath)" } else { "install.json not found or missing installPath" }
+        Detail = if ($hasMeta) { "Resolved via install.json: $metaInstallPath" } else { "install.json not found or missing installPath" }
     })
 
     # 2. Check Engine Entrypoint

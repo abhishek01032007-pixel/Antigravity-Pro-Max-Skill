@@ -5,14 +5,47 @@
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $ErrorActionPreference = "Stop"
 
-# Determine engine root
+# Determine engine root dynamically
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$engineRoot = Resolve-Path (Join-Path $scriptDir "..\..\engine")
-$repoRoot = Resolve-Path (Join-Path $engineRoot "..")
+$engineRoot = $null
+
+# 1. Explicit environment variable from host
+if ($env:NEXORA_ENGINE_ROOT -and (Test-Path (Join-Path $env:NEXORA_ENGINE_ROOT "Application\NexoraApplicationService.ps1"))) {
+    $engineRoot = (Resolve-Path $env:NEXORA_ENGINE_ROOT).Path
+}
+# 2. Runtime root environment variable
+elseif ($env:NEXORA_RUNTIME_ROOT -and (Test-Path (Join-Path $env:NEXORA_RUNTIME_ROOT "engine\Application\NexoraApplicationService.ps1"))) {
+    $engineRoot = (Resolve-Path (Join-Path $env:NEXORA_RUNTIME_ROOT "engine")).Path
+}
+# 3. Install path environment variable
+elseif ($env:NEXORA_INSTALL_PATH) {
+    $directEng = Join-Path $env:NEXORA_INSTALL_PATH "engine"
+    $nestedEng = Join-Path $env:NEXORA_INSTALL_PATH "runtime\engine"
+    if (Test-Path (Join-Path $directEng "Application\NexoraApplicationService.ps1")) {
+        $engineRoot = (Resolve-Path $directEng).Path
+    } elseif (Test-Path (Join-Path $nestedEng "Application\NexoraApplicationService.ps1")) {
+        $engineRoot = (Resolve-Path $nestedEng).Path
+    }
+}
+
+# 4. Development repository fallback (strictly disabled in installed mode)
+if (-not $engineRoot -and $env:NEXORA_RUNTIME_MODE -ne "installed") {
+    $devEng = Join-Path $scriptDir "..\..\engine"
+    if (Test-Path (Join-Path $devEng "Application\NexoraApplicationService.ps1")) {
+        $engineRoot = (Resolve-Path $devEng).Path
+    }
+}
+
+if (-not $engineRoot -or -not (Test-Path (Join-Path $engineRoot "Application\NexoraApplicationService.ps1"))) {
+    [Console]::Error.WriteLine("[NexoraBridgeHost] Fatal: Could not locate Nexora engine modules at '$engineRoot' (Mode: $env:NEXORA_RUNTIME_MODE).")
+    exit 1
+}
+
+$repoRoot = (Resolve-Path (Join-Path $engineRoot "..")).Path
 
 # Set active runtime path in session environment if not configured
 if (-not $env:NEXORA_INSTALL_PATH -or -not (Test-Path $env:NEXORA_INSTALL_PATH)) {
-    $env:NEXORA_INSTALL_PATH = $repoRoot.Path
+    $env:NEXORA_INSTALL_PATH = $repoRoot
 }
 
 # Load all required engine modules once into worker session

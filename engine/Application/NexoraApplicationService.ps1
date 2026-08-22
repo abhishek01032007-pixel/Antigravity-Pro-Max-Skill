@@ -533,7 +533,8 @@ function Get-NexoraApplicationUpdateStatus {
     if ($vFile -and (Test-Path $vFile)) {
         try {
             $v = Get-Content $vFile -Raw | ConvertFrom-Json
-            if ($v.coreVersion) { $currentVersion = $v.coreVersion }
+            if ($v.version) { $currentVersion = $v.version }
+            elseif ($v.coreVersion) { $currentVersion = $v.coreVersion }
         } catch {}
     }
 
@@ -573,7 +574,8 @@ function Invoke-NexoraApplicationDoctor {
     
     $runtimePath = Resolve-NexoraInstalledRuntimePath
     $meta = Get-NexoraInstallationMetadata
-    $hasMeta = ($null -ne $meta -and (Test-Path $meta.installPath))
+    $metaInstallPath = if ($meta) { if ($meta.PSObject.Properties["installPath"] -and $meta.installPath) { $meta.installPath } elseif ($meta.PSObject.Properties["runtimeRoot"] -and $meta.runtimeRoot) { $meta.runtimeRoot } else { $null } } else { $null }
+    $hasMeta = ($null -ne $metaInstallPath -and (Test-Path -LiteralPath $metaInstallPath))
     
     $engineFile = if ($runtimePath) { Join-Path $runtimePath "engine\Core\NexoraEngine.ps1" } else { $null }
     $hasEngine = ($engineFile -and (Test-Path $engineFile))
@@ -634,7 +636,7 @@ function Invoke-NexoraApplicationDoctor {
             label      = "Installation Metadata"
             name       = "Installation Metadata"
             status     = if ($hasMeta) { "OK" } else { "WARN" }
-            detail     = if ($hasMeta) { $meta.installPath } else { "Missing install.json" }
+            detail     = if ($hasMeta) { $metaInstallPath } else { "Missing install.json" }
             repairable = $true
         },
         [PSCustomObject]@{

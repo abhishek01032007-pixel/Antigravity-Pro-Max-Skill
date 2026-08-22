@@ -35,6 +35,9 @@ Thumbs.db
 # Archives generated locally
 *.zip
 dist/
+release/
+desktop/dist/
+desktop/out/
 *.iss.backup
 
 winget-manifests/

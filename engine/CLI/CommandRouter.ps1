@@ -21,12 +21,22 @@ function Route-NexoraCommand {
     }
 
     if ($ParsedArgs.Flags.ContainsKey("version") -or $ParsedArgs.Command -eq "version") {
-        $root = Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent
-        $vFile = Join-Path $root "nexora-version.json"
-        if (Test-Path $vFile) {
+        $candidatePaths = @()
+        if ($env:NEXORA_INSTALL_PATH) {
+            $candidatePaths += (Join-Path $env:NEXORA_INSTALL_PATH "nexora-version.json")
+        }
+        $candidatePaths += (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) "nexora-version.json")
+        $candidatePaths += (Join-Path (Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent) "nexora-version.json")
+        $vFile = $null
+        foreach ($cp in $candidatePaths) {
+            if ($cp -and (Test-Path $cp)) { $vFile = $cp; break }
+        }
+        if ($vFile) {
             $v = Get-Content $vFile -Raw | ConvertFrom-Json
-            Write-Host "Nexora Core Version: $($v.coreVersion)" -ForegroundColor Cyan
-            Write-Host "Skill Pack Version : $($v.skillPackVersion)" -ForegroundColor Cyan
+            $ver = if ($v.version) { $v.version } elseif ($v.coreVersion) { $v.coreVersion } else { "1.0.0" }
+            $spVer = if ($v.skillPackVersion) { $v.skillPackVersion } else { $ver }
+            Write-Host "Nexora Core Version: $ver" -ForegroundColor Cyan
+            Write-Host "Skill Pack Version : $spVer" -ForegroundColor Cyan
         }
         else {
             Write-Host "Nexora Core Version: 1.0.0" -ForegroundColor Cyan

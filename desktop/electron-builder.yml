@@ -1,0 +1,48 @@
+appId: com.nexora.skillsmanager
+productName: Nexora Skills Manager
+executableName: NexoraSkillsManager
+
+directories:
+  output: dist
+  buildResources: build
+
+files:
+  - "main.js"
+  - "preload.js"
+  - "bridge/**/*.js"
+  - "ipc/**/*.js"
+  - "registry/**/*.js"
+  - "package.json"
+  - from: "../ui"
+    to: "ui"
+    filter:
+      - "**/*"
+      - "!tests/**"
+  - "!tests/**"
+  - "!dist/**"
+  - "!out/**"
+  - "!**/*.ps1"
+  - "!node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}"
+  - "!node_modules/*/{test,__tests__,tests,powered-test,example,examples}"
+
+asar: true
+
+win:
+  target:
+    - target: dir
+      arch:
+        - x64
+    - target: zip
+      arch:
+        - x64
+  artifactName: "NexoraSkillsManager-${version}-win-${arch}.${ext}"
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: false
+  perMachine: false
+  allowElevation: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Nexora Skills Manager
+  uninstallDisplayName: Nexora Skills Manager

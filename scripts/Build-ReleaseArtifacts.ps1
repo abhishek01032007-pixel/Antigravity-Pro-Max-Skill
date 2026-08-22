@@ -1,0 +1,156 @@
+# Build-ReleaseArtifacts.ps1 - Production Release Packaging Tool for Nexora Skills Manager
+# Packages Desktop ZIP, Shared Runtime ZIP, SHA-256 checksums, and release-manifest.json.
+
+param(
+    [string]$OutputDir = $null,
+    [switch]$SkipDesktopBuild
+)
+
+$ErrorActionPreference = "Stop"
+
+$RepoRoot = Split-Path $PSScriptRoot -Parent
+if (-not $OutputDir) {
+    $OutputDir = Join-Path $RepoRoot "release"
+}
+
+if (-not (Test-Path $OutputDir)) {
+    New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
+}
+
+# 1. Read master version from nexora-version.json
+$verFile = Join-Path $RepoRoot "nexora-version.json"
+if (-not (Test-Path $verFile)) {
+    throw "nexora-version.json missing at: $verFile"
+}
+$verObj = Get-Content $verFile -Raw | ConvertFrom-Json
+$version = if ($verObj.coreVersion) { $verObj.coreVersion } else { "1.0.0" }
+
+Write-Host "=== Building Nexora Skills Manager v$version Release Artifacts ===" -ForegroundColor Cyan
+
+# 2. Build Desktop package if not skipped
+$desktopDir = Join-Path $RepoRoot "desktop"
+$desktopDist = Join-Path $desktopDir "dist"
+$desktopZipName = "NexoraSkillsManager-$version-win-x64.zip"
+$desktopZipTarget = Join-Path $OutputDir $desktopZipName
+
+if (-not $SkipDesktopBuild) {
+    Write-Host "[1/4] Building Desktop Package (dir + zip)..." -ForegroundColor Yellow
+    Push-Location $desktopDir
+    try {
+        npm run build
+        if ($LASTEXITCODE -ne 0) { throw "Desktop build failed with exit code $LASTEXITCODE" }
+    }
+    finally {
+        Pop-Location
+    }
+}
+
+# Copy or move Desktop ZIP to release output
+$builtDesktopZip = Join-Path $desktopDist $desktopZipName
+if (-not (Test-Path $builtDesktopZip)) {
+    # Fallback to any matching zip in desktop dist
+    $candidate = Get-ChildItem $desktopDist -Filter "*.zip" | Select-Object -First 1
+    if ($candidate) {
+        Copy-Item $candidate.FullName $desktopZipTarget -Force
+    } else {
+        throw "Desktop zip artifact not found in $desktopDist"
+    }
+} else {
+    Copy-Item $builtDesktopZip $desktopZipTarget -Force
+}
+Write-Host "      Desktop Package: $desktopZipTarget" -ForegroundColor Green
+
+# 3. Build Shared Runtime Archive
+Write-Host "[2/4] Packaging Shared Runtime Archive..." -ForegroundColor Yellow
+$runtimeZipName = "NexoraRuntime-$version.zip"
+$runtimeZipTarget = Join-Path $OutputDir $runtimeZipName
+
+$stagingRoot = Join-Path $env:TEMP ("NexoraRuntimeStaging-" + [guid]::NewGuid().ToString("N"))
+$runtimeStaging = Join-Path $stagingRoot "runtime"
+New-Item -ItemType Directory -Path $runtimeStaging -Force | Out-Null
+
+try {
+    # 3a. Copy engine (exclude Tests)
+    $engineSrc = Join-Path $RepoRoot "engine"
+    $engineDst = Join-Path $runtimeStaging "engine"
+    New-Item -ItemType Directory -Path $engineDst -Force | Out-Null
+    Get-ChildItem $engineSrc -Force | Where-Object { $_.Name -ne "Tests" } | ForEach-Object {
+        Copy-Item $_.FullName (Join-Path $engineDst $_.Name) -Recurse -Force
+    }
+
+    # 3b. Copy bridge host
+    $bridgeDst = Join-Path $runtimeStaging "bridge"
+    New-Item -ItemType Directory -Path $bridgeDst -Force | Out-Null
+    Copy-Item (Join-Path $RepoRoot "desktop\bridge\NexoraDesktopBridgeHost.ps1") (Join-Path $bridgeDst "NexoraDesktopBridgeHost.ps1") -Force
+
+    # 3c. Copy canonical skill packs
+    $skillsDst = Join-Path $runtimeStaging "skills"
+    New-Item -ItemType Directory -Path $skillsDst -Force | Out-Null
+    $skillPacks = @("Frontend-Pro-Max", "Backend-Pro-Max", "Backend-Frameworks", "QA-Debug-Pro-Max", "Fullstack-Extras")
+    foreach ($pack in $skillPacks) {
+        $srcP = Join-Path $RepoRoot $pack
+        if (Test-Path $srcP) {
+            Copy-Item $srcP (Join-Path $runtimeStaging $pack) -Recurse -Force
+            # Also mirror into skills root for flat discovery
+            Copy-Item $srcP (Join-Path $skillsDst $pack) -Recurse -Force
+        }
+    }
+
+    # 3d. Copy Loaders, version, and batch scripts
+    Copy-Item (Join-Path $RepoRoot "Loaders") (Join-Path $runtimeStaging "Loaders") -Recurse -Force
+    Copy-Item (Join-Path $RepoRoot "nexora-version.json") (Join-Path $runtimeStaging "nexora-version.json") -Force
+    Copy-Item (Join-Path $RepoRoot "Start-Nexora-Skills-Manager.bat") (Join-Path $runtimeStaging "Start-Nexora-Skills-Manager.bat") -Force
+    Copy-Item (Join-Path $RepoRoot "Start-Antigravity-Pro-Max.bat") (Join-Path $runtimeStaging "Start-Antigravity-Pro-Max.bat") -Force
+
+    # Compress runtime staging
+    if (Test-Path $runtimeZipTarget) { Remove-Item $runtimeZipTarget -Force }
+    Compress-Archive -Path "$stagingRoot\*" -DestinationPath $runtimeZipTarget -Force
+}
+finally {
+    if (Test-Path $stagingRoot) {
+        Remove-Item $stagingRoot -Recurse -Force -ErrorAction SilentlyContinue
+    }
+}
+Write-Host "      Runtime Package: $runtimeZipTarget" -ForegroundColor Green
+
+# 4. Generate SHA-256 Checksums
+Write-Host "[3/4] Generating SHA-256 Checksums..." -ForegroundColor Yellow
+$desktopHash = (Get-FileHash -Path $desktopZipTarget -Algorithm SHA256).Hash.ToLowerInvariant()
+$runtimeHash = (Get-FileHash -Path $runtimeZipTarget -Algorithm SHA256).Hash.ToLowerInvariant()
+
+$checksumContent = @"
+$desktopHash  $desktopZipName
+$runtimeHash  $runtimeZipName
+"@
+Set-Content -Path (Join-Path $OutputDir "SHA256SUMS.txt") -Value $checksumContent.Trim() -Encoding ASCII
+
+# 5. Generate release-manifest.json
+Write-Host "[4/4] Generating release-manifest.json..." -ForegroundColor Yellow
+$manifest = [PSCustomObject]@{
+    version   = $version
+    channel   = "stable"
+    createdAt = (Get-Date).ToString("o")
+    desktop   = [PSCustomObject]@{
+        file   = $desktopZipName
+        sha256 = $desktopHash
+        size   = (Get-Item $desktopZipTarget).Length
+    }
+    runtime   = [PSCustomObject]@{
+        file   = $runtimeZipName
+        sha256 = $runtimeHash
+        size   = (Get-Item $runtimeZipTarget).Length
+    }
+}
+
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+$manifestJson = $manifest | ConvertTo-Json -Depth 5
+[System.IO.File]::WriteAllText((Join-Path $OutputDir "release-manifest.json"), $manifestJson, $utf8NoBom)
+
+Write-Host ""
+Write-Host "=== Release Artifacts Successfully Created in $OutputDir ===" -ForegroundColor Green
+Write-Host "Desktop Artifact: $desktopZipName (SHA-256: $desktopHash)"
+Write-Host "Runtime Artifact: $runtimeZipName (SHA-256: $runtimeHash)"
+Write-Host "Manifest:         release-manifest.json"
+Write-Host ""
+
+return $manifest
