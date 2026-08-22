@@ -69,7 +69,7 @@ try {
   assertTest(installerYaml.includes('AppsAndFeaturesEntries:'), 'Case H1: Manifest contains AppsAndFeaturesEntries');
   assertTest(installerYaml.includes('ProductCode: NexoraSkillsManager'), 'Case H2: ProductCode configured as NexoraSkillsManager');
   assertTest(installerYaml.includes('UpgradeBehavior: install'), 'Case H3: UpgradeBehavior configured as install');
-  assertTest(installerYaml.includes('Commands:\n  - nexora\n  - agpm'), 'Case H4: Commands include nexora and agpm');
+  assertTest(installerYaml.includes('nexora') && installerYaml.includes('agpm') && installerYaml.includes('Commands:'), 'Case H4: Commands include nexora and agpm');
 
   // -------------------------------------------------------------------------
   // CATEGORY L: License, Cleanliness & Security

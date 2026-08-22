@@ -117,10 +117,23 @@ try {
         $_.LastAccessTime = [datetime]"2026-01-01T00:00:00"
     }
 
-    # Compress runtime staging deterministically
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    # Compress runtime staging deterministically via Python zipfile
     if (Test-Path $runtimeZipTarget) { Remove-Item $runtimeZipTarget -Force }
-    [System.IO.Compression.ZipFile]::CreateFromDirectory($stagingRoot, $runtimeZipTarget, [System.IO.Compression.CompressionLevel]::Optimal, $false)
+    $pyScript = @"
+import os, zipfile
+staging = r'$stagingRoot'
+target = r'$runtimeZipTarget'
+with zipfile.ZipFile(target, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zf:
+    for root, dirs, files in os.walk(staging):
+        dirs.sort()
+        for file in sorted(files):
+            full_path = os.path.join(root, file)
+            rel_path = os.path.relpath(full_path, staging)
+            zinfo = zipfile.ZipInfo(rel_path, date_time=(2026, 1, 1, 0, 0, 0))
+            with open(full_path, 'rb') as src:
+                zf.writestr(zinfo, src.read(), compress_type=zipfile.ZIP_DEFLATED)
+"@
+    python -c "$pyScript"
 }
 finally {
     if (Test-Path $stagingRoot) {

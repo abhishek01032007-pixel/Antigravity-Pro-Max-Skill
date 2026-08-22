@@ -1,7 +1,7 @@
 # Sync-WinGetManifests.ps1 - Generates development WinGet manifests for Nexora.NexoraSkillsManager
 param(
     [string]$Version = "1.0.0",
-    [string]$Sha256 = "2CEB45090124BA19BA7C07E72A25CD0701D7E435434A54B6961EB7AEA65E4E5B"
+    [string]$Sha256 = "3D4A3467E1E284710764FB840DD3E4182E245DE25FF5161E7DBFEDAA80C5256C"
 )
 
 $ErrorActionPreference = "Stop"
