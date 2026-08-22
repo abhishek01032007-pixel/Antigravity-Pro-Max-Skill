@@ -121,19 +121,41 @@ finally {
 }
 Write-Host "      Runtime Package: $runtimeZipTarget" -ForegroundColor Green
 
-# 4. Generate SHA-256 Checksums
-Write-Host "[3/4] Generating SHA-256 Checksums..." -ForegroundColor Yellow
+# 4. Compile Windows Installer Bootstrapper EXE
+Write-Host "[3/5] Compiling Windows Installer Bootstrapper..." -ForegroundColor Yellow
+$installerExeName = "NexoraSkillsManager-Setup-$version.exe"
+$installerExeTarget = Join-Path $OutputDir $installerExeName
+$cscPath = "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
+$bootstrapperCs = Join-Path $RepoRoot "scripts\installer\NexoraInstallerBootstrapper.cs"
+
+if (Test-Path $cscPath) {
+    & $cscPath /target:winexe /out:"$installerExeTarget" /optimize+ "$bootstrapperCs" | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning "Failed to compile installer bootstrapper executable. Exit code: $LASTEXITCODE"
+    } else {
+        Write-Host "      Installer Executable: $installerExeTarget" -ForegroundColor Green
+    }
+} else {
+    Write-Warning "C# compiler not found at $cscPath. Skipping installer executable compilation."
+}
+
+# 5. Generate SHA-256 Checksums
+Write-Host "[4/5] Generating SHA-256 Checksums..." -ForegroundColor Yellow
 $desktopHash = (Get-FileHash -Path $desktopZipTarget -Algorithm SHA256).Hash.ToLowerInvariant()
 $runtimeHash = (Get-FileHash -Path $runtimeZipTarget -Algorithm SHA256).Hash.ToLowerInvariant()
+$installerHash = if (Test-Path $installerExeTarget) { (Get-FileHash -Path $installerExeTarget -Algorithm SHA256).Hash.ToLowerInvariant() } else { "" }
 
 $checksumContent = @"
 $desktopHash  $desktopZipName
 $runtimeHash  $runtimeZipName
 "@
+if ($installerHash) {
+    $checksumContent += "`n$installerHash  $installerExeName"
+}
 Set-Content -Path (Join-Path $OutputDir "SHA256SUMS.txt") -Value $checksumContent.Trim() -Encoding ASCII
 
-# 5. Generate release-manifest.json
-Write-Host "[4/4] Generating release-manifest.json..." -ForegroundColor Yellow
+# 6. Generate release-manifest.json
+Write-Host "[5/5] Generating release-manifest.json..." -ForegroundColor Yellow
 $manifest = [PSCustomObject]@{
     schemaVersion           = 1
     product                 = "Nexora Skills Manager"
@@ -166,9 +188,12 @@ $manifestJson = $manifest | ConvertTo-Json -Depth 5
 
 Write-Host ""
 Write-Host "=== Release Artifacts Successfully Created in $OutputDir ===" -ForegroundColor Green
-Write-Host "Desktop Artifact: $desktopZipName (SHA-256: $desktopHash)"
-Write-Host "Runtime Artifact: $runtimeZipName (SHA-256: $runtimeHash)"
-Write-Host "Manifest:         release-manifest.json"
+Write-Host "Desktop Artifact:   $desktopZipName (SHA-256: $desktopHash)"
+Write-Host "Runtime Artifact:   $runtimeZipName (SHA-256: $runtimeHash)"
+if ($installerHash) {
+    Write-Host "Installer Artifact: $installerExeName (SHA-256: $installerHash)"
+}
+Write-Host "Manifest:           release-manifest.json"
 Write-Host ""
 
 return $manifest

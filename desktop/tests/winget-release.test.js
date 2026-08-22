@@ -49,37 +49,48 @@ try {
   assertTest(localeYaml.includes('Moniker: nexora'), 'Case C: Moniker is nexora');
   assertTest(versionYaml.includes('PackageVersion: 1.0.0'), 'Case D: Manifest PackageVersion is 1.0.0');
   assertTest(installerYaml.includes('Architecture: x64'), 'Case E: Installer architecture is x64');
+  assertTest(installerYaml.includes('Scope: user'), 'Case E2: Installer scope is user');
 
   // -------------------------------------------------------------------------
-  // CATEGORY F: URLs, Checksums & License
+  // CATEGORY F: Installer Architecture & Invariants
   // -------------------------------------------------------------------------
-  const expectedUrl = 'https://github.com/abhishek01032007-pixel/Nexora-Skills-Manager/releases/download/v1.0.0/NexoraSkillsManager-1.0.0-win-x64.zip';
-  assertTest(installerYaml.includes(expectedUrl), 'Case F: InstallerUrl points to v1.0.0 release artifact');
+  assertTest(installerYaml.includes('InstallerType: exe'), 'Case F1: InstallerType is exe (full installer lifecycle)');
+  assertTest(!installerYaml.includes('NestedInstallerType: portable'), 'Case F2: Strictly avoids portable packaging bypass');
+  const expectedUrl = 'https://github.com/abhishek01032007-pixel/Nexora-Skills-Manager/releases/download/v1.0.0/NexoraSkillsManager-Setup-1.0.0.exe';
+  assertTest(installerYaml.includes(expectedUrl), 'Case F3: InstallerUrl points to v1.0.0 setup executable');
   const shaMatch = installerYaml.match(/InstallerSha256:\s*([A-Fa-f0-9]{64})/);
   assertTest(!!shaMatch && shaMatch[1].length === 64, 'Case G: InstallerSha256 is valid 64-char hex checksum');
-  assertTest(localeYaml.includes('License: MIT'), 'Case L: License matches repository MIT license');
+  assertTest(installerYaml.includes('Silent: --silent'), 'Case G2: InstallerSwitches configures silent switch');
+  assertTest(installerYaml.includes('interactive') && installerYaml.includes('silent'), 'Case G3: InstallModes contains interactive and silent');
+
+  // -------------------------------------------------------------------------
+  // CATEGORY H: Apps & Features Detection & Upgrade
+  // -------------------------------------------------------------------------
+  assertTest(installerYaml.includes('AppsAndFeaturesEntries:'), 'Case H1: Manifest contains AppsAndFeaturesEntries');
+  assertTest(installerYaml.includes('ProductCode: NexoraSkillsManager'), 'Case H2: ProductCode configured as NexoraSkillsManager');
+  assertTest(installerYaml.includes('UpgradeBehavior: install'), 'Case H3: UpgradeBehavior configured as install');
+  assertTest(installerYaml.includes('Commands:\n  - nexora\n  - agpm'), 'Case H4: Commands include nexora and agpm');
+
+  // -------------------------------------------------------------------------
+  // CATEGORY L: License, Cleanliness & Security
+  // -------------------------------------------------------------------------
+  assertTest(localeYaml.includes('License: MIT'), 'Case L1: License matches repository MIT license');
   assertTest(localeYaml.includes('PackageUrl: https://github.com/abhishek01032007-pixel/Nexora-Skills-Manager'), 'Case L2: PackageUrl points to public repository');
+  assertTest(!versionYaml.includes('D:\\') && !installerYaml.includes('D:\\') && !localeYaml.includes('D:\\'), 'Case L3: Zero local developer paths in WinGet manifests');
+  assertTest(!versionYaml.includes('ghp_') && !installerYaml.includes('ghp_') && !localeYaml.includes('ghp_'), 'Case L4: Zero embedded secrets in WinGet manifests');
+  assertTest(!localeYaml.includes('Nexora Inc') && !localeYaml.includes('Nexora Technologies'), 'Case L5: Zero fabricated corporate publisher entities');
 
   // -------------------------------------------------------------------------
-  // CATEGORY H: Safety & Cleanliness
-  // -------------------------------------------------------------------------
-  assertTest(!versionYaml.includes('D:\\') && !installerYaml.includes('D:\\') && !localeYaml.includes('D:\\'), 'Case H: Zero local developer paths in WinGet manifests');
-  assertTest(!versionYaml.includes('ghp_') && !installerYaml.includes('ghp_') && !localeYaml.includes('ghp_'), 'Case I: Zero embedded secrets in WinGet manifests');
-  assertTest(!localeYaml.includes('Nexora Inc') && !localeYaml.includes('Nexora Technologies'), 'Case Q: Zero fabricated corporate publisher entities');
-
-  // -------------------------------------------------------------------------
-  // CATEGORY M: Schema & Installer Invariants
+  // CATEGORY M: Schema & Version Invariants
   // -------------------------------------------------------------------------
   assertTest(versionYaml.includes('ManifestVersion: 1.9.0'), 'Case M1: Version manifest uses schema 1.9.0');
   assertTest(installerYaml.includes('ManifestVersion: 1.9.0'), 'Case M2: Installer manifest uses schema 1.9.0');
   assertTest(localeYaml.includes('ManifestVersion: 1.9.0'), 'Case M3: Locale manifest uses schema 1.9.0');
-  assertTest(installerYaml.includes('PortableCommandAlias: nexora'), 'Case N: Portable command alias configured for nexora');
-  assertTest(installerYaml.includes('UpgradeBehavior: install'), 'Case O: UpgradeBehavior configured as install');
+  assertTest(nexoraVersion.coreVersion === '1.0.0', 'Case K: Core version matches WinGet manifest version 1.0.0');
 
   // -------------------------------------------------------------------------
-  // CATEGORY R: Version Consistency & Documentation Rules
+  // CATEGORY R: Documentation Truthfulness
   // -------------------------------------------------------------------------
-  assertTest(nexoraVersion.coreVersion === '1.0.0', 'Case K: Core version matches WinGet manifest version 1.0.0');
   assertTest(!readme.includes('winget install nexora') || readme.includes('coming') || readme.includes('WinGet'), 'Case R: README does not make premature claims of live WinGet resolution');
   assertTest(readme.includes('irm https://raw.githubusercontent.com/abhishek01032007-pixel/Nexora-Skills-Manager/main/setup.ps1 | iex'), 'Case S: Primary installation remains canonical PowerShell setup');
 

@@ -1,7 +1,7 @@
 # Sync-WinGetManifests.ps1 - Generates development WinGet manifests for Nexora.NexoraSkillsManager
 param(
     [string]$Version = "1.0.0",
-    [string]$Sha256 = "88EDAE88834EF1E237291689045EF3B716E5D8D180228332E9790FB59312B773"
+    [string]$Sha256 = "C454A19F43D94371A576894FBA88AC4EADAB0E1BC81E31630E4D54623E11B424"
 )
 
 $ErrorActionPreference = "Stop"
@@ -32,19 +32,28 @@ $installerYaml = @"
 PackageIdentifier: Nexora.NexoraSkillsManager
 PackageVersion: $Version
 InstallerLocale: en-US
-InstallerType: zip
-NestedInstallerType: portable
-NestedInstallerFiles:
-  - RelativeFilePath: NexoraSkillsManager.exe
-    PortableCommandAlias: nexora
+InstallerType: exe
+Scope: user
+InstallModes:
+  - interactive
+  - silent
+  - silentWithProgress
+InstallerSwitches:
+  Silent: --silent
+  SilentWithProgress: --silent
+UpgradeBehavior: install
 Commands:
   - nexora
   - agpm
+AppsAndFeaturesEntries:
+  - DisplayName: Nexora Skills Manager
+    DisplayVersion: $Version
+    Publisher: Nexora Skills Manager
+    ProductCode: NexoraSkillsManager
 Installers:
   - Architecture: x64
-    InstallerUrl: https://github.com/abhishek01032007-pixel/Nexora-Skills-Manager/releases/download/v$Version/NexoraSkillsManager-$Version-win-x64.zip
+    InstallerUrl: https://github.com/abhishek01032007-pixel/Nexora-Skills-Manager/releases/download/v$Version/NexoraSkillsManager-Setup-$Version.exe
     InstallerSha256: $Sha256
-    UpgradeBehavior: install
 ManifestType: installer
 ManifestVersion: 1.9.0
 "@
@@ -78,4 +87,4 @@ ManifestVersion: 1.9.0
 "@
 Set-Content -Path (Join-Path $ManifestBase "Nexora.NexoraSkillsManager.locale.en-US.yaml") -Value $localeYaml -Encoding UTF8
 
-Write-Host "WinGet manifests successfully generated for Nexora.NexoraSkillsManager v$Version" -ForegroundColor Green
+Write-Host "WinGet manifests successfully generated for Nexora.NexoraSkillsManager v$Version (Installer: exe)" -ForegroundColor Green

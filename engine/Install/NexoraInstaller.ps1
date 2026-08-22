@@ -380,7 +380,7 @@ if defined NEXORA_INSTALL_PATH if exist "%NEXORA_INSTALL_PATH%\Start-Nexora-Skil
 
 set "META=$StateRoot\install.json"
 if exist "%META%" (
-    for /f "usebackq delims=" %%I in (`powershell -NoProfile -Command "(Get-Content '%META%' -Raw | ConvertFrom-Json).runtimeRoot"`) do set "NEXORA_INSTALL_PATH=%%I"
+    for /f "usebackq delims=" %%I in (``powershell -NoProfile -Command "(Get-Content '%META%' -Raw | ConvertFrom-Json).runtimeRoot"``) do set "NEXORA_INSTALL_PATH=%%I"
 )
 
 if defined NEXORA_INSTALL_PATH if exist "%NEXORA_INSTALL_PATH%\Start-Nexora-Skills-Manager.bat" (
