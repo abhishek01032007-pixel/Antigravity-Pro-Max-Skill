@@ -126,7 +126,7 @@ export const UpdateProgressModal = {
   },
 
   // Item 12: Registered Project Lifecycle Edge Cases (Already Registered, Missing, Moved, Inaccessible)
-  renderProjectLifecycleDialog({ type = "already_registered", projectName = "Academic Day Hub", path = "D:\\Projects\\academic_day_hub" }) {
+  renderProjectLifecycleDialog({ type = "already_registered", projectName = "Project", path = "" } = {}) {
     let title = "Project Notice";
     let icon = "info";
     let iconColor = "var(--color-primary)";

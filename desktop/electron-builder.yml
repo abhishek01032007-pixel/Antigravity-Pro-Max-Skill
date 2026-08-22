@@ -12,6 +12,7 @@ files:
   - "bridge/**/*.js"
   - "ipc/**/*.js"
   - "registry/**/*.js"
+  - "updates/**/*.js"
   - "package.json"
   - from: "../ui"
     to: "ui"

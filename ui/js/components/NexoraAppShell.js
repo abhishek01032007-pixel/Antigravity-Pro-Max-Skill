@@ -6,7 +6,7 @@
  */
 
 export const NexoraAppShell = {
-  render(activeNav = "dashboard", { isOffline = false, hasUpdate = false } = {}) {
+  render(activeNav = "dashboard", { isOffline = false, hasUpdate = false, showDevControls = false } = {}) {
     return `
       <!-- Fixed Sidebar (240px) -->
       <aside class="sidebar">
@@ -59,9 +59,11 @@ export const NexoraAppShell = {
             </div>
           </div>
           <div class="topbar-right">
-            <button class="topbar-icon-btn" id="btn-topbar-offline-toggle" title="Toggle Mock Offline State">
-              <span class="material-symbols-outlined" style="font-size: 16px;">${isOffline ? 'cloud_off' : 'cloud_done'}</span>
-            </button>
+            ${showDevControls ? `
+              <button class="topbar-icon-btn" id="btn-topbar-offline-toggle" title="Toggle Mock Offline State">
+                <span class="material-symbols-outlined" style="font-size: 16px;">${isOffline ? 'cloud_off' : 'cloud_done'}</span>
+              </button>
+            ` : ''}
             <button class="topbar-icon-btn" id="btn-topbar-notifications" title="Notifications">
               <span class="material-symbols-outlined" style="font-size: 16px;">notifications</span>
             </button>

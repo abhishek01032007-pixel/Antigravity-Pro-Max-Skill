@@ -378,6 +378,24 @@ async function runTests() {
     // =========================================================================
     assertTest(testRoot.includes('NexoraSec86-'), 'Case R1: All test operations strictly confined to temporary test sandbox');
 
+    // =========================================================================
+    // CATEGORY S: Real Release Artifact Manifest Contract Validation
+    // =========================================================================
+    const realManifestPath = nodePath.resolve(__dirname, '../../release/release-manifest.json');
+    if (fsp.existsSync(realManifestPath)) {
+      const realManifestRaw = JSON.parse(fsp.readFileSync(realManifestPath, 'utf8'));
+      const manifestClient = new UpdateManifestClient();
+      const validatedManifest = manifestClient.validateManifest(realManifestRaw);
+
+      assertTest(validatedManifest.product === 'Nexora Skills Manager', 'Case S1: Real manifest product name is Nexora Skills Manager');
+      assertTest(validatedManifest.desktop.platform === 'win32', 'Case S2: Real manifest desktop platform is win32');
+      assertTest(validatedManifest.runtime.platform === 'win32', 'Case S3: Real manifest runtime platform is win32');
+      assertTest(validatedManifest.desktop.arch === 'x64', 'Case S4: Real manifest desktop architecture is x64');
+      assertTest(validatedManifest.runtime.arch === 'x64', 'Case S5: Real manifest runtime architecture is x64');
+      assertTest(validatedManifest.desktop.sha256.length === 64, 'Case S6: Real manifest desktop SHA-256 is 64 hex characters');
+      assertTest(validatedManifest.runtime.sha256.length === 64, 'Case S7: Real manifest runtime SHA-256 is 64 hex characters');
+    }
+
     console.log(`\n=== Phase 8.6 Security Suite: ${passedCount} Passed, ${failedCount} Failed ===\n`);
 
     if (failedCount > 0) {

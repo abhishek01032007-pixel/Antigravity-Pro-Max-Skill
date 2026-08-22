@@ -27,6 +27,7 @@ import { PlatformSelectionScreen } from './screens/PlatformSelectionScreen.js';
 import { RecentActivityScreen } from './screens/RecentActivityScreen.js';
 import { SystemHealthScreen } from './screens/SystemHealthScreen.js';
 import { UpdateCenterScreen } from './screens/UpdateCenterScreen.js';
+import { SettingsAboutScreen } from './screens/SettingsAboutScreen.js';
 
 class NexoraApp {
   constructor() {
@@ -49,7 +50,7 @@ class NexoraApp {
       "update-center": UpdateCenterScreen,
       "projects": DashboardScreen,
       "skills": SkillLibraryScreen,
-      "settings": PlatformSelectionScreen
+      "settings": SettingsAboutScreen
     };
   }
 
@@ -60,7 +61,8 @@ class NexoraApp {
     // Render Shell with initial state
     root.innerHTML = NexoraAppShell.render(this.currentView, {
       isOffline: this.data.state ? !!this.data.state.isOffline : false,
-      hasUpdate: this.data.state ? (!!this.data.state.appUpdateAvailable && !this.data.state.updateDismissed) : false
+      hasUpdate: this.data.state ? (!!this.data.state.appUpdateAvailable && !this.data.state.updateDismissed) : false,
+      showDevControls: !this.data.isLiveMode
     });
     this.attachShellEvents();
 
@@ -107,7 +109,7 @@ class NexoraApp {
     });
 
     document.querySelectorAll('[data-nav="settings"]').forEach(btn => {
-      btn.addEventListener('click', () => this.navigate('platform-selection'));
+      btn.addEventListener('click', () => this.navigate('settings'));
     });
 
     // Offline Toggle
@@ -138,7 +140,8 @@ class NexoraApp {
 
     root.innerHTML = NexoraAppShell.render(this.currentView, {
       isOffline: this.data.state ? !!this.data.state.isOffline : false,
-      hasUpdate: this.data.state ? (!!this.data.state.appUpdateAvailable && !this.data.state.updateDismissed) : false
+      hasUpdate: this.data.state ? (!!this.data.state.appUpdateAvailable && !this.data.state.updateDismissed) : false,
+      showDevControls: !this.data.isLiveMode
     });
     this.attachShellEvents();
   }

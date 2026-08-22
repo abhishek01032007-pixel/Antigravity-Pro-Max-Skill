@@ -5,7 +5,7 @@
  * persistent PowerShellProcessHost lifecycle, and navigation locking.
  */
 
-const { app, BrowserWindow, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { PowerShellProcessHost } = require('./bridge/PowerShellProcessHost');
@@ -13,6 +13,9 @@ const { registerBridgeIpc } = require('./ipc/bridge-handler');
 
 let mainWindow = null;
 let processHost = null;
+
+// Suppress default Electron application menu bar on Windows
+Menu.setApplicationMenu(null);
 
 /**
  * Resolves the appropriate path to ui/index.html across development and packaged ASAR modes.
@@ -93,7 +96,7 @@ async function createWindow() {
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     try {
       const parsed = new URL(url);
-      if (parsed.protocol === 'https:' && parsed.hostname === 'github.com' && parsed.pathname.startsWith('/abhishek01032007-pixel/Nexora-Skills-Manager/releases')) {
+      if (parsed.protocol === 'https:' && parsed.hostname === 'github.com' && parsed.pathname.startsWith('/abhishek01032007-pixel/Nexora-Skills-Manager')) {
         const { shell } = require('electron');
         shell.openExternal(url);
       }
@@ -101,7 +104,20 @@ async function createWindow() {
     return { action: 'deny' };
   });
 
-  // 5. Load UI index.html dynamically
+  // 5. Packaged Mode: Block developer shortcuts (F12, Ctrl+Shift+I, Ctrl+Shift+R)
+  if (app.isPackaged) {
+    mainWindow.webContents.on('before-input-event', (event, input) => {
+      if (input.type === 'keyDown') {
+        if (input.key === 'F12') {
+          event.preventDefault();
+        } else if (input.control && input.shift && (input.key.toLowerCase() === 'i' || input.key.toLowerCase() === 'r')) {
+          event.preventDefault();
+        }
+      }
+    });
+  }
+
+  // 6. Load UI index.html dynamically
   const uiPath = resolveRendererEntry();
   mainWindow.loadFile(uiPath);
 

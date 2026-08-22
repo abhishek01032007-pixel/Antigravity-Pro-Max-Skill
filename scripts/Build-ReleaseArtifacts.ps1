@@ -143,7 +143,7 @@ $manifest = [PSCustomObject]@{
     publishedAt             = (Get-Date).ToString("o")
     releaseNotesUrl         = "https://github.com/abhishek01032007-pixel/Nexora-Skills-Manager/releases/tag/v$version"
     desktop                 = [PSCustomObject]@{
-        platform = "windows"
+        platform = "win32"
         arch     = "x64"
         file     = $desktopZipName
         url      = "https://github.com/abhishek01032007-pixel/Nexora-Skills-Manager/releases/download/v$version/$desktopZipName"
@@ -151,7 +151,7 @@ $manifest = [PSCustomObject]@{
         size     = (Get-Item $desktopZipTarget).Length
     }
     runtime                 = [PSCustomObject]@{
-        platform = "windows"
+        platform = "win32"
         arch     = "x64"
         file     = $runtimeZipName
         url      = "https://github.com/abhishek01032007-pixel/Nexora-Skills-Manager/releases/download/v$version/$runtimeZipName"

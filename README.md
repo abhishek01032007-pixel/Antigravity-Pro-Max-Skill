@@ -5,165 +5,111 @@
 
 <h1 align="center">⚡ NEXORA SKILLS MANAGER</h1>
 
-<h3 align="center">Next-Generation Modular Skill & Agent Orchestration for AI-Assisted Development</h3>
+<h3 align="center">Local-first developer skill management and orchestration for supported AI coding platforms.</h3>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/⌘%20FRONTEND-F59E0B?style=for-the-badge&labelColor=FDBA74&color=EA580C" alt="Frontend" />
-  <img src="https://img.shields.io/badge/🧩%20BACKEND-8B5CF6?style=for-the-badge&labelColor=C4B5FD&color=7C3AED" alt="Backend" />
-  <img src="https://img.shields.io/badge/🐞%20QA%20%2F%20DEBUG-10B981?style=for-the-badge&labelColor=6EE7B7&color=059669" alt="QA Debug" />
-  <img src="https://img.shields.io/badge/🔗%20FULL%20STACK-2563EB?style=for-the-badge&labelColor=93C5FD&color=1D4ED8" alt="Full Stack" />
+  <img src="https://img.shields.io/badge/Platform-Windows%20x64-0078D4?style=flat-square" alt="Platform: Windows x64" />
+  <img src="https://img.shields.io/badge/Release-v1.0.0-2563EB?style=flat-square" alt="Release: v1.0.0" />
+  <img src="https://img.shields.io/badge/CLI-nexora-0F766E?style=flat-square" alt="CLI: nexora" />
+  <img src="https://img.shields.io/badge/Legacy%20Alias-agpm-6B7280?style=flat-square" alt="Legacy: agpm" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License: MIT" />
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/One%20Setup-374151?style=flat-square" alt="One Setup" />
-  <img src="https://img.shields.io/badge/Command-nexora-0F766E?style=flat-square" alt="Command nexora" />
-  <img src="https://img.shields.io/badge/Legacy%20Support-agpm-6B7280?style=flat-square" alt="Legacy agpm" />
-  <img src="https://img.shields.io/badge/Project--Scoped-4B5563?style=flat-square" alt="Project Scoped" />
-  <img src="https://img.shields.io/badge/Skills-Modular-2563EB?style=flat-square" alt="Modular Skills" />
-  <img src="https://img.shields.io/badge/Windows-Compatible-059669?style=flat-square" alt="Windows Compatible" />
-</p>
-
-<p align="center">
-  <strong>One setup. Unified CLI. Project-scoped agent intelligence.</strong>
-</p>
-
-<p align="center">
-  Nexora Skills Manager (formerly <em>Antigravity-Pro-Max-Skill</em>) is a high-performance, project-scoped skill manager for Google Antigravity and modern agentic development environments on Windows. It delivers curated, role-specific engineering skills directly to your project without polluting global environments or overriding built-in agent capabilities.
+  <strong>One setup. Native Desktop host. Local-first AI agent skill orchestration.</strong>
 </p>
 
 ---
 
-## 🌟 Product Vision
+## 🌟 Overview
 
-Modern software engineering with AI agents requires context-aware specialization. Generic prompts fail on complex stacks, while global skill bloat slows agents down and degrades accuracy.
+**Nexora Skills Manager** is a local-first desktop application and unified command-line tool for managing, customizing, and deploying engineering skills to modern AI coding assistants.
 
-**Nexora Skills Manager** solves this by introducing dynamic, project-scoped skill injection:
-- **Zero Global Pollution**: Skills attach exclusively to active project workspaces under `.agents/skills`.
-- **Role-Based Modes**: Instantly activate dedicated profiles for Frontend, Backend, QA/Debugging, or Full Stack workflows.
-- **Framework Precision**: Granular framework packs for Flutter, FastAPI, Node.js, and modern cloud architectures.
-- **Safe Lifecycle**: Switch modes cleanly, monitor active skills with health checks, or reset to baseline with zero footprint.
-
----
-
-## 🏗 What Nexora Solves
-
-| Challenge | Without Nexora | With Nexora Skills Manager |
-|---|---|---|
-| **Skill Management** | Manual copying of Markdown prompts and fragmented repos | Single CLI command (`nexora`) to manage and activate packs |
-| **Context Pollution** | Hundreds of unneeded skills injected globally into the agent | Strictly scoped to `<project>/.agents/skills` based on active task mode |
-| **Workflow Friction** | Reconfiguring IDEs and agent settings for different projects | Switch modes (Frontend, Backend, QA, Fullstack) in seconds |
-| **Framework Depth** | Surface-level code generation | Deep architectural patterns (CQRS, TDD, Clean Architecture, Security Auditing) |
-
----
-
-## 🧭 Architecture & How It Works
-
-```text
-                        ┌────────────────────────┐
-                        │     nexora (CLI)       │
-                        │ (agpm legacy fallback) │
-                        └───────────┬────────────┘
-                                    │
-                                    ▼
-                         [Select Target Project]
-                                    │
-                                    ▼
-                         [Select Workspace Mode]
-                                    │
-        ┌───────────────────┼───────────────────┬───────────────────┐
-        │                   │                   │                   │
-        ▼                   ▼                   ▼                   ▼
-  🎨 FRONTEND          ⚙️ BACKEND         🧪 QA / DEBUG       🔗 FULL STACK
-    • Flutter / UI       • API Design        • Unit / Widget     • End-to-End
-    • Web / Mobile       • FastApi / Node    • Static Analysis   • All Skill Packs
-    • Design Systems     • Security / DB     • Code Review       • Architecture
-        │                   │                   │                   │
-        └───────────────────┴───────────────────┴───────────────────┘
-                                    │
-                                    ▼
-                    Target Project Workspace Directory
-                        <project>/.agents/skills/
-                                    │
-                                    ▼
-                      AI Agent Workflows Activated
-```
-
----
-
-## 📦 Curated Skill Library
-
-Nexora organizes over 50+ specialized engineering skills across dedicated functional domains:
-
-```text
-NEXORA SKILLS MANAGER
-│
-├── 🎨 Frontend-Pro-Max
-│   ├── Flutter, Dart, & Native interop
-│   ├── Mobile & Responsive Web layouts
-│   ├── UI/UX Design Systems & Micro-animations
-│   └── Frontend Performance Optimization
-│
-├── ⚙️ Backend-Pro-Max
-│   ├── API Design (REST, GraphQL, gRPC)
-│   ├── Clean Architecture & Microservices (CQRS, Event Sourcing)
-│   ├── Backend Security & Authentication (OAuth2, OIDC)
-│   ├── Database Workflows & SQL Query Optimization
-│   └── Resilient Error Handling Patterns
-│
-├── 🧪 QA-Debug-Pro-Max
-│   ├── Unit, Widget, and Integration Testing
-│   ├── Runtime Debugging & Crash Diagnostics
-│   ├── Static Analysis & Lint Auto-fixing
-│   ├── Architecture & Security Auditing
-│   └── E2E Testing Patterns
-│
-├── 🔗 Fullstack-Extras
-│   └── Cross-stack feature orchestration & workflow automation
-│
-├── 🧩 Backend-Frameworks
-│   ├── Python (FastAPI, Async Architectures)
-│   └── NodeJS (Modern Backend APIs, Microservices)
-│
-└── 🧭 Loaders
-    └── Dynamic interactive project selection, mode switching, & status reporting
-```
+Nexora manages project analysis, skill state, and platform deployment locally. Outbound network access is used strictly for initial installation and explicit user-initiated update checks and downloads.
 
 ---
 
 ## 🤖 Supported AI Platforms
 
-Nexora Skills Manager adheres to standard agent customization formats (`SKILL.md` specifications with YAML frontmatter):
+Nexora formats and deploys active engineering skills to standard workspace configurations across supported AI coding platforms:
 
-- 🪐 **Google Antigravity (AGY)**: Native support with project-level `.agents/skills` discovery.
-- 💻 **Antigravity IDE & 2.0 Agents**: Seamless hot-reload and task orchestration.
-- ⚡ **Claude Code / Anthropic Agent Ecosystems**: Standard YAML frontmatter compliance.
-- 🛠 **Cursor, Copilot, & Custom Agent Toolchains**: Compatible with workspace-level skill repositories.
+| Platform | Integration Target | Format / Standard |
+| :--- | :--- | :--- |
+| **Google Antigravity** | `.agents/skills/<skill>/` | Standard `SKILL.md` with YAML frontmatter |
+| **Cursor** | `.cursor/rules/<skill>.mdc` | MDC structured instructions |
+| **GitHub Copilot** | `.github/copilot-instructions.md` | Workspace instructions specification |
+
+*Note: Nexora Skills Manager is an independent open-source project and is not affiliated with, endorsed by, or sponsored by Google, Cursor, or GitHub.*
 
 ---
 
-## ⚡ Installation
+## ⚡ Installation (Windows x64)
 
-### Option 1: One-Command Setup (PowerShell)
+### One-Command PowerShell Setup
 
-Open **Windows PowerShell** and run:
-
-```powershell
-irm agpm.dev/install | iex
-```
-
-The installer will:
-1. Download and verify the Nexora Skills Manager runtime.
-2. Install all skill packs and loaders to the local runtime path (`C:\Antigravity Pro Max Skill`).
-3. Register the primary **`nexora`** command in your User `PATH`.
-4. Register the backward-compatible **`agpm`** alias.
-
-### Option 2: Manual / Local Installation
-
-Clone or download this repository, then run from an elevated PowerShell terminal:
+Open **Windows PowerShell** (PowerShell 5.1+) and run:
 
 ```powershell
-.\install.ps1
+irm https://raw.githubusercontent.com/abhishek01032007-pixel/Nexora-Skills-Manager/main/setup.ps1 | iex
 ```
+
+### What the Installer Does
+
+1. Downloads and extracts the verified release payload.
+2. Deploys the shared runtime engine and skill packs to `%LOCALAPPDATA%\NexoraSkillsManager\runtime\`.
+3. Installs the packaged Desktop host to `%LOCALAPPDATA%\Programs\NexoraSkillsManager\`.
+4. Registers the primary **`nexora`** command in your User `PATH` (`%LOCALAPPDATA%\NexoraSkillsManager\bin\`).
+5. Configures the backward-compatible **`agpm`** forwarder.
+6. Creates Start Menu shortcuts and registers Windows Apps & Features entries.
+
+> **Windows SmartScreen Note**: Initial unsigned v1.0.0 release builds may display a standard Windows Defender SmartScreen notice ("Windows protected your PC") because Authenticode certificate signing is not yet enabled. Click **More info** → **Run anyway** to proceed.
+
+---
+
+## 🖥️ Desktop Application Features
+
+Nexora Desktop provides a modern, dark-mode visual interface for managing your developer workspace:
+
+- **Dashboard**: View registered projects, detected tech stacks, active skill counts, and real-time health indicators.
+- **Projects & Analysis**: Inspect project frameworks, markers (e.g. `pubspec.yaml`, `package.json`, `requirements.txt`), and architecture profiles.
+- **Curated Skill Library**: Browse 48+ domain-specific skills across Frontend, Backend, QA/Diagnostics, Architecture, and Mobile engineering.
+- **Activity Log**: Inspect chronological records of skill activations, deactivations, project scans, and maintenance tasks.
+- **Maintenance & System Health**: Run on-demand diagnostic suites verifying runtime engines, platform adapters, and directory health.
+- **Settings & About**: Configure AI platform targets (Antigravity, Cursor, Copilot), inspect runtime paths, and view version details.
+- **Update Center**: Perform explicit remote update checks, download verified update packages with progress tracking, and install updates with automated rollback safety.
+
+---
+
+## 🔄 Core Product Workflow
+
+```text
+Add / Select Local Project
+         │
+         ▼
+Deep Project Stack Analysis (Detected Classification)
+         │
+         ▼
+Select Current Working Mode (Frontend, Backend, QA/Debug, Fullstack)
+         │
+         ▼
+Select Development Target (e.g. Flutter UI, REST API, Testing Suite)
+         │
+         ▼
+Review Recommendations ──► Select Specific Skills
+                                     │
+                                     ▼
+Select AI Platform Targets (Antigravity, Cursor, Copilot)
+                                     │
+                                     ▼
+Activate Skills ──► Adapters Deploy Scoped Workspace Files
+```
+
+### Critical Concept Distinctions
+
+- **Detected Project Classification**: The objective tech stack discovered on disk (e.g. Flutter/Dart frontend, Node.js backend).
+- **Current Working Mode**: Your active task focus (Frontend, Backend, QA/Debug, Fullstack).
+- **Development Target**: The immediate objective you are building (e.g. Responsive Layouts, Unit Tests).
+- **Recommended vs Selected vs Active**: Recommendations are suggestions based on stack analysis; selection is your explicit choice; active skills are currently deployed in workspace files.
 
 ---
 
@@ -171,107 +117,99 @@ Clone or download this repository, then run from an elevated PowerShell terminal
 
 ### Primary Command: `nexora`
 
-Launch the interactive project selector and mode manager:
-
 ```powershell
+# Open interactive CLI / view status
 nexora
+
+# View help and available arguments
+nexora --help
+
+# Display installed version
+nexora --version
+
+# Run full runtime and environment diagnostics
+nexora doctor
+
+# List available skills in catalog
+nexora skills
+
+# Scan and analyze active project
+nexora scan
 ```
 
-#### Planned CLI Capabilities (Roadmap):
-- `nexora scan` — Inspect the current project and detect missing or unlinked skills.
-- `nexora skills` — List all available skill packs and framework modules.
-- `nexora update` — Check for skill pack and core updates from GitHub.
-- `nexora doctor` — Verify agent runtime environment, paths, and skill validity.
+### Backward Compatibility Alias: `agpm`
 
-### Backward Compatibility: `agpm`
-
-For existing workflows and muscle memory, the `agpm` command is fully preserved:
+For existing workflows, the `agpm` command is preserved as a lightweight compatibility forwarder to `nexora`:
 
 ```powershell
 agpm
 ```
 
-*When executed, `agpm` presents a brief migration notice and seamlessly forwards all arguments to the `nexora` engine.*
+---
+
+## 🔒 Security, Local-First Execution & Updates
+
+### Privacy & Data Safety
+
+- **Local Execution**: All project scanning, code classification, and skill deployments execute 100% locally on your machine.
+- **Zero Telemetry**: Nexora does not transmit project contents or telemetry as part of its implemented update workflow.
+- **Zero Credentials**: Nexora never requests or stores private API keys, GitHub tokens, or account passwords.
+
+### Secure Remote Updates
+
+- **Explicit Checks**: Nexora never silently installs updates or downloads binaries in the background. All checks and installations require explicit user confirmation.
+- **Cryptographic Verification**: Release manifests and ZIP archives are verified via SHA-256 hashes against trusted GitHub endpoints before execution.
+- **Transactional Rollback**: If an update installation encounters an issue, the helper script automatically rolls back to the previous stable version.
 
 ---
 
-## 🧭 Available Modes
+## 🛠️ Maintenance, Repair & Uninstallation
 
-When running `nexora`, you can select:
+### Repairing an Installation
 
-| Mode | Key Included Skills | Best Used For |
-|---|---|---|
-| **[1] Frontend Pro Max** | Flutter, Mobile, Web, UI/UX, Responsive Design | Mobile apps, web frontends, component design |
-| **[2] Backend Pro Max** | APIs, Clean Architecture, Security, FastAPI/Node | REST/GraphQL backends, microservices, databases |
-| **[3] QA / Debug Pro Max** | Unit tests, Mocking, Diagnostics, Auditing | Bug reproduction, test coverage, code reviews |
-| **[4] Full Stack Pro Max** | All Frontend + Backend + QA + Orchestration | End-to-end full stack product development |
-| **[5] Default Mode** | Cleans all managed skills from project | Returning workspace to default state |
-| **[6] Status** | Diagnostic report on active skills and health | Checking current mode and skill counts |
+If runtime files are damaged or deleted, navigate to **Settings & About** → **System Health** in the Desktop app, or re-run `setup.ps1` to restore runtime components without altering project files.
 
----
+### Clean Uninstallation
 
-## 🔢 Version System
-
-Nexora tracks versioning via dual synchronized manifests:
-- **`nexora-version.json`** *(Primary)*
-- **`agpm-version.json`** *(Compatibility)*
-
-```json
-{
-  "coreVersion": "1.0.0",
-  "skillPackVersion": "1.0.0"
-}
-```
-
-Repository scripts automatically synchronize version changes across installer definitions (`Antigravity-Pro-Max-Setup.iss`) and manifests via:
+Run the uninstaller via **Windows Settings → Installed Apps → Nexora Skills Manager → Uninstall**, or execute:
 
 ```powershell
-powershell -File .\scripts\Sync-Version.ps1
+powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\NexoraSkillsManager\runtime\install\uninstall.ps1"
+```
+
+**What is removed**:
+- Desktop application, runtime engine, CLI shims, Start Menu shortcuts, and PATH entries.
+
+**What is strictly preserved**:
+- All your project source directories and workspaces.
+- Registered project list (`projects.json`) and custom user skills.
+
+---
+
+## 🧑‍💻 Developer Setup & Building from Source
+
+To run or build Nexora Skills Manager from source:
+
+```powershell
+# 1. Clone repository
+git clone https://github.com/abhishek01032007-pixel/Nexora-Skills-Manager.git
+cd Nexora-Skills-Manager
+
+# 2. Install desktop dependencies
+cd desktop
+npm install
+
+# 3. Launch Desktop in development mode
+npm start
+
+# 4. Build release artifacts
+powershell -ExecutionPolicy Bypass -File ..\scripts\Build-ReleaseArtifacts.ps1
 ```
 
 ---
 
-## 🗺 Roadmap
+## 📜 License & Notices
 
-- [x] **Phase 0: Brand Migration**
-  - Establish Nexora Skills Manager identity.
-  - Introduce `nexora` CLI command with `agpm` backward compatibility.
-  - Dual version synchronization and installer updates.
-- [ ] **Phase 1: CLI Expansion**
-  - Implement standalone CLI subcommands (`scan`, `skills`, `update`, `doctor`).
-  - Add non-interactive flag support (e.g. `nexora --mode fullstack --project .`).
-- [ ] **Phase 2: Expanded Framework Ecosystem**
-  - Add Go, Rust, and Next.js / React 19 framework packs.
-  - Custom user skill registry and import support.
-- [ ] **Phase 3: Multi-Platform Installer & Cross-Platform Support**
-  - Native installer enhancements (WinGet / MSIX).
-  - macOS and Linux compatibility runners.
+Nexora Skills Manager is distributed under the [MIT License](file:///d:/Nexora%20Skills%20Manager%20GitHub/LICENSE).
 
----
-
-## 🛡 Safe Installation & Security
-
-Nexora Skills Manager is built with security-first principles:
-- **Zero Credential Requests**: Never requests GitHub tokens, passwords, or private API keys.
-- **Local Isolation**: All skill actions take place locally within your chosen project folder.
-- **Non-Destructive**: Never deletes user source code. Skills are installed into `.agents/skills` and can be reset at any time with Mode `[5]`.
-
----
-
-## 📜 Open-Source Attribution & Notices
-
-Nexora Skills Manager packages and coordinates high-quality open-source skill content from various upstream sources.
-For full licensing terms and attribution details, see [THIRD_PARTY_NOTICES.md](file:///d:/Nexora%20Skills%20Manager%20GitHub/THIRD_PARTY_NOTICES.md) and the [third-party-licenses](file:///d:/Nexora%20Skills%20Manager%20GitHub/third-party-licenses) directory.
-
----
-
-## ⚠️ Disclaimer
-
-Nexora Skills Manager is an independent community project and is not affiliated with or endorsed by Google. All trademarks belong to their respective owners.
-
-<p align="center">
-  <br>
-  <strong>⚡ NEXORA SKILLS MANAGER</strong>
-  <br>
-  <em>Next-Generation Modular Skill Orchestration</em>
-</p>
+For third-party dependencies, open-source attributions, and licenses, see [THIRD_PARTY_NOTICES.md](file:///d:/Nexora%20Skills%20Manager%20GitHub/THIRD_PARTY_NOTICES.md).
