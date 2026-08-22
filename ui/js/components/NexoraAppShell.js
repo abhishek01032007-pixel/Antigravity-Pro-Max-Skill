@@ -1,12 +1,12 @@
 /**
  * ============================================================================
  * NEXORA SKILLS MANAGER - REUSABLE SHELL COMPONENT (NexoraAppShell.js)
- * 240px Fixed Sidebar + 32px Fixed Top Bar
+ * 240px Fixed Sidebar + 32px Fixed Top Bar (with Offline and Update indicators)
  * ============================================================================
  */
 
 export const NexoraAppShell = {
-  render(activeNav = "dashboard") {
+  render(activeNav = "dashboard", { isOffline = false, hasUpdate = false } = {}) {
     return `
       <!-- Fixed Sidebar (240px) -->
       <aside class="sidebar">
@@ -53,13 +53,16 @@ export const NexoraAppShell = {
         <!-- Top Status Bar (32px) -->
         <header class="topbar">
           <div class="topbar-left">
-            <div class="topbar-status">
-              <span class="status-dot status-dot-success"></span>
-              <span>● Healthy | Up to date</span>
+            <div class="topbar-status" id="topbar-status-pill">
+              <span class="status-dot ${isOffline ? 'status-dot-warning' : 'status-dot-success'}"></span>
+              <span>${isOffline ? '● Offline (Local Mode)' : (hasUpdate ? '● Healthy | Update Available' : '● Healthy | Up to date')}</span>
             </div>
           </div>
           <div class="topbar-right">
-            <button class="topbar-icon-btn" title="Notifications">
+            <button class="topbar-icon-btn" id="btn-topbar-offline-toggle" title="Toggle Mock Offline State">
+              <span class="material-symbols-outlined" style="font-size: 16px;">${isOffline ? 'cloud_off' : 'cloud_done'}</span>
+            </button>
+            <button class="topbar-icon-btn" id="btn-topbar-notifications" title="Notifications">
               <span class="material-symbols-outlined" style="font-size: 16px;">notifications</span>
             </button>
             <button class="topbar-icon-btn" title="Settings" data-nav="settings">

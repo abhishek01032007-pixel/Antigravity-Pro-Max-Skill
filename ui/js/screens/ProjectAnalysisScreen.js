@@ -1,5 +1,5 @@
 /**
- * ProjectAnalysisScreen.js - Project Analysis & Stack Inspection Screen (Stitch Reference)
+ * ProjectAnalysisScreen.js - Project Analysis & Stack Inspection Screen (Extended Phase 6.1B)
  */
 import { SectionHeader } from '../components/SectionHeader.js';
 import { StatusBadge } from '../components/StatusBadge.js';
@@ -7,15 +7,20 @@ import { StatusBadge } from '../components/StatusBadge.js';
 export const ProjectAnalysisScreen = {
   render(data) {
     const project = data.sampleProject;
+    const state = data.state;
 
     return `
       <div class="content-container">
         ${SectionHeader.render({
-          title: "Project Analysis: Academic Day Hub",
+          title: `Project Analysis: ${project.name}`,
           actionsHtml: `
             <button class="btn btn-secondary" id="btn-analysis-back">
               <span class="material-symbols-outlined" style="font-size: 16px;">arrow_back</span>
               <span>Back to Dashboard</span>
+            </button>
+            <button class="btn btn-secondary" id="btn-analysis-choose-mode">
+              <span class="material-symbols-outlined" style="font-size: 16px;">tune</span>
+              <span>${state.currentWorkingMode ? 'Change Working Mode' : 'Choose Working Mode'}</span>
             </button>
             <button class="btn btn-primary" id="btn-analysis-rescan">
               <span class="material-symbols-outlined" style="font-size: 16px;">refresh</span>
@@ -24,6 +29,25 @@ export const ProjectAnalysisScreen = {
           `
         })}
 
+        <!-- Analysis Progress Radar Container (Hidden by Default, Shown during Rescan) -->
+        <div class="card hidden flex flex-col gap-3" id="analysis-radar-container" style="padding: var(--space-4); background-color: var(--color-surface-container); border-color: var(--color-primary);">
+          <div class="flex items-center justify-between">
+            <span style="font-size: var(--text-section-header); font-weight: 600; color: var(--color-primary);" id="analysis-radar-title">
+              Analyzing Academic Day Hub...
+            </span>
+            <span class="badge badge-warning" id="analysis-radar-badge">Scanning</span>
+          </div>
+          <div style="width: 100%; height: 6px; background: var(--color-surface-high); border-radius: var(--radius-full); overflow: hidden;">
+            <div id="analysis-radar-bar" style="width: 30%; height: 100%; background: var(--color-primary-accent); transition: width 0.3s;"></div>
+          </div>
+          <div class="flex flex-col gap-1 text-muted" style="font-size: var(--text-meta);" id="analysis-radar-steps">
+            <span>● Detecting languages (Dart)</span>
+            <span>● Detecting frameworks (Flutter)</span>
+            <span>● Detecting database & backend (Supabase / PostgreSQL)</span>
+            <span>● Calculating project classification...</span>
+          </div>
+        </div>
+
         <div class="bento-grid">
           <!-- Summary Card (12 Cols) -->
           <div class="col-12 card flex items-center justify-between">
@@ -31,9 +55,19 @@ export const ProjectAnalysisScreen = {
               <span style="font-size: var(--text-meta); color: var(--color-outline);">Target Project Path</span>
               <span class="code-pill" style="font-size: var(--text-body-sm);">${project.path}</span>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-4">
               <div class="flex flex-col items-end">
-                <span style="font-size: var(--text-meta); color: var(--color-outline);">Classification Confidence</span>
+                <span style="font-size: var(--text-meta); color: var(--color-outline);">Detected Classification</span>
+                <span class="badge badge-primary" style="font-size: var(--text-body-sm);">${project.type}</span>
+              </div>
+              <div class="flex flex-col items-end">
+                <span style="font-size: var(--text-meta); color: var(--color-outline);">Current Working Mode</span>
+                <span style="font-size: var(--text-body-sm); font-weight: 600; color: ${state.currentWorkingMode ? 'var(--color-primary)' : 'var(--color-outline)'};">
+                  ${state.currentWorkingMode ? `${state.currentWorkingMode} (${state.currentTarget})` : 'Not Selected'}
+                </span>
+              </div>
+              <div class="flex flex-col items-end">
+                <span style="font-size: var(--text-meta); color: var(--color-outline);">Confidence</span>
                 <span style="font-size: var(--text-screen-title); font-weight: 700; color: var(--color-primary);">${project.confidence}%</span>
               </div>
               ${StatusBadge.render("Ready")}
@@ -96,7 +130,7 @@ export const ProjectAnalysisScreen = {
             </div>
 
             <div style="margin-top: auto; padding-top: var(--space-3); border-top: 1px solid var(--color-outline-variant);">
-              <span style="font-size: var(--text-meta); color: var(--color-outline);">Mode: Full Stack (Mobile + Backend)</span>
+              <span style="font-size: var(--text-meta); color: var(--color-outline);">Detected: Full Stack (Mobile + Backend)</span>
             </div>
           </div>
         </div>
@@ -105,8 +139,24 @@ export const ProjectAnalysisScreen = {
   },
   attachEvents(app) {
     document.getElementById('btn-analysis-back')?.addEventListener('click', () => app.navigate('dashboard'));
+
+    document.getElementById('btn-analysis-choose-mode')?.addEventListener('click', () => {
+      app.startModeSelectionWizard();
+    });
+
     document.getElementById('btn-analysis-rescan')?.addEventListener('click', () => {
-      app.showToast("Analysis refreshed for Academic Day Hub.");
+      const radar = document.getElementById('analysis-radar-container');
+      const bar = document.getElementById('analysis-radar-bar');
+      if (radar && bar) {
+        radar.classList.remove('hidden');
+        bar.style.width = '30%';
+        setTimeout(() => { bar.style.width = '70%'; }, 400);
+        setTimeout(() => {
+          bar.style.width = '100%';
+          radar.classList.add('hidden');
+          app.showToast("Project analysis completed (96% confidence).");
+        }, 900);
+      }
     });
   }
 };

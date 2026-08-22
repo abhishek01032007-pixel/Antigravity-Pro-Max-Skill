@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * NEXORA SKILLS MANAGER - MOCK BRIDGE SERVICE (BridgeService.js)
- * PHASE 6.1A UI MOCK & STUB PROVIDER ONLY
+ * PHASE 6.1A & 6.1B UI MOCK & STUB PROVIDER ONLY
  * 
  * Strict Phase Boundary:
  * - Pure UI mock / stub interface
@@ -12,12 +12,12 @@
  */
 
 export const BridgeService = {
-  // Locked Sample Project Data
+  // Locked Sample Project Data (Baseline v1.0.0)
   sampleProject: {
     id: "proj_academic_hub",
     name: "Academic Day Hub",
     path: "D:\\Projects\\academic_day_hub",
-    type: "Mobile Application",
+    type: "Full Stack Application",
     developmentMode: "Full Stack",
     confidence: 96,
     status: "Ready",
@@ -31,13 +31,28 @@ export const BridgeService = {
     activeSkillCount: 6
   },
 
+  // In-Memory Workflow State (Begins Unselected)
+  state: {
+    isOffline: false,
+    updateDismissed: false,
+    appUpdateAvailable: true,
+    skillSyncStatus: "up-to-date", // "checking" | "up-to-date" | "update-available" | "failed"
+    currentWorkingMode: null,      // Begins null (Not Selected)
+    currentTarget: null,           // Begins null (Not Selected)
+    selectedSkillsForActivation: [
+      "flutter-build-responsive-layout",
+      "flutter-add-widget-test"
+    ],
+    selectedPlatforms: ["Google Antigravity", "Cursor"]
+  },
+
   // Additional projects for carousel & cross-project views
   allProjects: [
     {
       id: "proj_academic_hub",
       name: "Academic Day Hub",
       path: "D:\\Projects\\academic_day_hub",
-      type: "Mobile Application",
+      type: "Full Stack Application",
       framework: "Flutter",
       status: "Ready",
       activeSkillCount: 6,
@@ -74,7 +89,7 @@ export const BridgeService = {
       version: "v1.0.0",
       status: "Active",
       platforms: ["Google Antigravity", "Cursor"],
-      description: "Responsive layouts using LayoutBuilder, MediaQuery, and Expanded/Flexible for multi-screen Flutter apps."
+      description: "Responsive layouts using LayoutBuilder, MediaQuery, and Expanded/Flexible widgets for multi-screen Flutter apps."
     },
     {
       id: "flutter-add-widget-test",
@@ -286,6 +301,60 @@ export const BridgeService = {
       details: "All 6 diagnostic health checks passed"
     }
   ],
+
+  // Phase 6.1B Workflow Mock Methods (Frontend in-memory only)
+  getDevelopmentModes() {
+    return [
+      { id: "frontend", title: "Frontend Development", desc: "UI, layouts, screens, components and client-side workflows.", icon: "devices" },
+      { id: "backend", title: "Backend Development", desc: "APIs, server logic, database and backend services.", icon: "dns" },
+      { id: "fullstack", title: "Full Stack Development", desc: "Frontend and backend work together.", icon: "layers" },
+      { id: "qa", title: "QA / Debugging", desc: "Testing, debugging, validation and regression work.", icon: "bug_report" }
+    ];
+  },
+
+  getDevelopmentTargets(modeId) {
+    const map = {
+      frontend: ["Web Application", "Website", "Mobile Application"],
+      backend: ["Web / App Backend", "API / Service", "Database / Data Layer"],
+      fullstack: ["Web Application", "Mobile Application"],
+      qa: ["Web Application", "Mobile Application", "Backend / API", "Full Project"]
+    };
+    return map[modeId] || map.frontend;
+  },
+
+  setWorkingMode(modeTitle, targetName) {
+    this.state.currentWorkingMode = modeTitle;
+    this.state.currentTarget = targetName;
+    return Promise.resolve({ success: true, mode: modeTitle, target: targetName });
+  },
+
+  refreshRecommendations(modeTitle, targetName) {
+    return Promise.resolve({
+      mode: modeTitle,
+      target: targetName,
+      recommendations: [
+        { id: "flutter-build-responsive-layout", name: "Flutter Responsive Layout", matchScore: 96, reason: `Ranked #1 for ${modeTitle} (${targetName})`, category: "Frontend", preselected: true },
+        { id: "flutter-add-widget-test", name: "Flutter Widget Testing", matchScore: 89, reason: `Component UI testing for ${targetName}`, category: "QA", preselected: true },
+        { id: "dart-add-unit-test", name: "Dart Unit Testing", matchScore: 82, reason: "Dart core logic test coverage", category: "QA", preselected: false }
+      ]
+    });
+  },
+
+  simulateActivation(skills, platforms, scenario = "success") {
+    return Promise.resolve({
+      status: scenario,
+      activatedSkills: skills,
+      deployments: platforms.map(p => ({
+        platform: p,
+        status: scenario === "failure" ? "Failed" : (scenario === "partial" && p.toLowerCase().includes("cursor") ? "Failed" : "Success")
+      }))
+    });
+  },
+
+  toggleOffline() {
+    this.state.isOffline = !this.state.isOffline;
+    return this.state.isOffline;
+  },
 
   // Mock API methods returning promises for seamless UI flow
   async getProject() {

@@ -1,5 +1,5 @@
 /**
- * ActiveSkillsScreen.js - Active Skills for Current Project Screen (Stitch Reference)
+ * ActiveSkillsScreen.js - Active Skills for Current Project Screen (Extended Phase 6.1B)
  * Shows exactly 6 active skills with actions: View Details, Update, Deactivate.
  */
 import { SectionHeader } from '../components/SectionHeader.js';
@@ -85,9 +85,11 @@ export const ActiveSkillsScreen = {
       });
     });
 
+    // Item 11: Trigger Skill Update Popup
     document.querySelectorAll('.action-update').forEach(btn => {
       btn.addEventListener('click', () => {
-        app.showToast("Skill is already at the latest version (v1.0.0).");
+        const id = btn.getAttribute('data-id');
+        app.showSkillUpdateModal(id);
       });
     });
 

@@ -32,6 +32,11 @@
   opacity: 0.92;
 }
 
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-secondary {
   background-color: transparent;
   border: 1px solid var(--color-outline-variant);
@@ -262,6 +267,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-4);
+  animation: fadeIn 0.15s ease;
 }
 
 .modal-dialog {
@@ -299,4 +305,51 @@
   align-items: center;
   justify-content: flex-end;
   gap: var(--space-3);
+}
+
+/* Side Sheet Drawer (Item 5) */
+.side-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(13, 13, 21, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 90;
+  display: flex;
+  justify-content: flex-end;
+  animation: fadeIn 0.15s ease;
+}
+
+.side-sheet-container {
+  width: 440px;
+  height: 100%;
+  background-color: var(--color-surface-low);
+  border-left: 1px solid var(--color-outline-variant);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-modal);
+  animation: slideLeft 0.2s ease;
+}
+
+.side-sheet-header {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-outline-variant);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideLeft {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

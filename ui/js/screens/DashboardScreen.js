@@ -1,19 +1,24 @@
 /**
- * DashboardScreen.js - Main Dashboard Screen (Stitch Reference)
+ * DashboardScreen.js - Main Dashboard Screen (Extended with Phase 6.1B Workflows)
  * Locked Sample: Academic Day Hub (Flutter / Supabase / PostgreSQL, 96% confidence, 6 active skills)
  */
 import { ProjectCard } from '../components/ProjectCard.js';
 import { StatusBadge } from '../components/StatusBadge.js';
+import { InlineNotice } from '../components/InlineNotice.js';
 
 export const DashboardScreen = {
   render(data) {
     const project = data.sampleProject;
     const allProjects = data.allProjects;
-    const activeSkills = data.activeSkills;
     const recommendedSkills = data.recommendedSkills;
+    const state = data.state;
 
     return `
       <div class="content-container">
+        <!-- Top Banner Notices (Offline / Update) -->
+        ${state.isOffline ? InlineNotice.renderOfflineBanner() : ''}
+        ${state.appUpdateAvailable && !state.updateDismissed ? InlineNotice.renderUpdateAvailableBanner("v1.1.0") : ''}
+
         <!-- Top: Project Carousel Slider -->
         <div class="flex items-center gap-3 w-full" style="overflow-x: auto; padding-bottom: var(--space-2);">
           ${allProjects.map(p => ProjectCard.render(p, p.selected)).join('')}
@@ -46,12 +51,28 @@ export const DashboardScreen = {
               </div>
             </div>
 
+            <!-- Working Mode Badge & Selector Panel (Domain Rule Preserved) -->
+            <div class="card" style="padding: var(--space-3); background-color: var(--color-surface-container); border-color: var(--color-outline-variant);">
+              <div class="flex items-center justify-between">
+                <div class="flex flex-col">
+                  <span style="font-size: var(--text-meta); color: var(--color-outline);">Current Working Mode:</span>
+                  <span style="font-size: var(--text-body-sm); font-weight: 600; color: ${state.currentWorkingMode ? 'var(--color-primary)' : 'var(--color-outline)'};">
+                    ${state.currentWorkingMode ? `${state.currentWorkingMode} (${state.currentTarget || 'Default'})` : 'Not Selected'}
+                  </span>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="btn-dash-choose-mode">
+                  <span class="material-symbols-outlined" style="font-size: 14px;">tune</span>
+                  <span>${state.currentWorkingMode ? 'Change Mode' : 'Choose Mode'}</span>
+                </button>
+              </div>
+            </div>
+
             <div class="flex items-center justify-between" style="border-top: 1px solid var(--color-outline-variant); padding-top: var(--space-4); margin-top: auto;">
               <div class="flex items-center gap-2">
                 ${StatusBadge.render(project.status)}
               </div>
               <div class="flex items-center gap-2">
-                <button class="btn btn-secondary btn-sm" id="btn-dash-analyze">Analyze Again</button>
+                <button class="btn btn-secondary btn-sm" id="btn-dash-analyze">Analyze Project</button>
                 <button class="btn btn-primary btn-sm" id="btn-dash-open-folder">Open Folder</button>
               </div>
             </div>
@@ -174,7 +195,7 @@ export const DashboardScreen = {
             </div>
 
             <button class="btn btn-primary w-full" id="btn-dash-activate-rec" style="margin-top: auto;">
-              Activate Selected <span class="material-symbols-outlined" style="font-size: 14px;">arrow_forward</span>
+              Review Recommendations <span class="material-symbols-outlined" style="font-size: 14px;">arrow_forward</span>
             </button>
           </div>
         </div>
@@ -186,5 +207,31 @@ export const DashboardScreen = {
     document.getElementById('btn-dash-analyze')?.addEventListener('click', () => app.navigate('project-analysis'));
     document.getElementById('btn-dash-view-active-skills')?.addEventListener('click', () => app.navigate('active-skills'));
     document.getElementById('btn-dash-activate-rec')?.addEventListener('click', () => app.navigate('recommended-skills'));
+
+    // Working Mode Selection Trigger (Item 1 / 3)
+    document.getElementById('btn-dash-choose-mode')?.addEventListener('click', () => {
+      app.startModeSelectionWizard();
+    });
+
+    // Offline Banner Handlers
+    document.getElementById('btn-offline-retry')?.addEventListener('click', () => {
+      app.data.state.isOffline = false;
+      app.showToast("Connection restored. Online services active.");
+      app.navigate('dashboard');
+    });
+
+    document.getElementById('btn-offline-dismiss')?.addEventListener('click', () => {
+      document.getElementById('offline-notice-banner')?.remove();
+    });
+
+    // Update Banner Handlers
+    document.getElementById('btn-banner-download-update')?.addEventListener('click', () => {
+      app.startAppUpdateFlow();
+    });
+
+    document.getElementById('btn-banner-dismiss-update')?.addEventListener('click', () => {
+      app.data.state.updateDismissed = true;
+      document.getElementById('app-update-banner')?.remove();
+    });
   }
 };
