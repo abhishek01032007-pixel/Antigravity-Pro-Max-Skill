@@ -110,9 +110,17 @@ try {
         Copy-Item $helperSrc (Join-Path $updateDst "NexoraUpdateHelper.ps1") -Force
     }
 
-    # Compress runtime staging
+    # Normalize timestamps for deterministic checksums
+    Get-ChildItem -Path $stagingRoot -Recurse | ForEach-Object {
+        $_.LastWriteTime = [datetime]"2026-01-01T00:00:00"
+        $_.CreationTime = [datetime]"2026-01-01T00:00:00"
+        $_.LastAccessTime = [datetime]"2026-01-01T00:00:00"
+    }
+
+    # Compress runtime staging deterministically
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
     if (Test-Path $runtimeZipTarget) { Remove-Item $runtimeZipTarget -Force }
-    Compress-Archive -Path "$stagingRoot\*" -DestinationPath $runtimeZipTarget -Force
+    [System.IO.Compression.ZipFile]::CreateFromDirectory($stagingRoot, $runtimeZipTarget, [System.IO.Compression.CompressionLevel]::Optimal, $false)
 }
 finally {
     if (Test-Path $stagingRoot) {
@@ -129,7 +137,9 @@ $cscPath = "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
 $bootstrapperCs = Join-Path $RepoRoot "scripts\installer\NexoraInstallerBootstrapper.cs"
 
 if (Test-Path $cscPath) {
-    & $cscPath /target:winexe /out:"$installerExeTarget" /r:"System.IO.Compression.FileSystem.dll" /optimize+ "$bootstrapperCs" | Out-Null
+    $icoPath = Join-Path $RepoRoot "assets\branding\NexoraSkillsManager.ico"
+    $iconArg = if (Test-Path $icoPath) { "/win32icon:`"$icoPath`"" } else { "" }
+    & $cscPath /target:winexe /out:"$installerExeTarget" $iconArg /r:"System.IO.Compression.FileSystem.dll" /optimize+ "$bootstrapperCs" | Out-Null
     if ($LASTEXITCODE -ne 0) {
         Write-Warning "Failed to compile installer bootstrapper executable. Exit code: $LASTEXITCODE"
     } else {

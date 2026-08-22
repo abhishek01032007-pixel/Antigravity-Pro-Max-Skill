@@ -186,7 +186,7 @@ try {
   // -------------------------------------------------------------------------
   const iconPath = path.join(repoRoot, 'assets/branding/NexoraSkillsManager.ico');
   const iconExists = fs.existsSync(iconPath);
-  assertTest(!iconExists, 'Case AO: Branded Windows ICO asset truthfully classified as ASSET_REQUIRED (unfabricated)');
+  assertTest(iconExists, 'Case AO: Canonical Windows ICO asset exists in release candidate');
 
   console.log(`\n=== Phase 9.4 Release Candidate Audit Suite: ${passed} Passed, ${failed} Failed ===\n`);
 

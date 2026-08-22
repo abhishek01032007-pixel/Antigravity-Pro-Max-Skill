@@ -66,15 +66,18 @@ try {
   // -------------------------------------------------------------------------
   assertTest(electronBuilderYml.includes('icon: "../assets/branding/NexoraSkillsManager.ico"'), 'Case H: electron-builder configures relative icon path');
   const iconPath = path.join(repoRoot, 'assets/branding/NexoraSkillsManager.ico');
+  const png1024Path = path.join(repoRoot, 'assets/branding/NexoraSkillsManager-1024.png');
   const iconExists = fs.existsSync(iconPath);
+  const pngExists = fs.existsSync(png1024Path);
+  assertTest(iconExists, 'Case I1: Canonical Windows ICO asset exists');
+  assertTest(pngExists, 'Case I2: Canonical 1024x1024 PNG asset exists');
+
   if (iconExists) {
     const iconBuf = fs.readFileSync(iconPath);
     const isIcoHeader = iconBuf.length >= 6 && iconBuf.readUInt16LE(0) === 0 && iconBuf.readUInt16LE(2) === 1;
     assertTest(isIcoHeader, 'Case J: Icon has valid Windows ICO magic header');
     const frameCount = iconBuf.readUInt16LE(4);
-    assertTest(frameCount >= 1, `Case K: Multi-frame icon contains ${frameCount} frames`);
-  } else {
-    assertTest(!iconExists, 'Case I: Branded Windows ICO asset truthfully classified as ASSET_REQUIRED (unfabricated)');
+    assertTest(frameCount >= 7, `Case K: Multi-frame icon contains ${frameCount} frames (expected >= 7)`);
   }
   assertTest(mainJs.includes('icon: windowIcon'), 'Case M: BrowserWindow explicitly configures windowIcon');
   assertTest(installerPs1.includes('NexoraSkillsManager.exe') && installerPs1.includes('CreateShortcut'), 'Case N: Installer configures Start Menu shortcut');

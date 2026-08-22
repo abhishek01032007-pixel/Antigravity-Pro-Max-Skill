@@ -16,8 +16,8 @@ namespace Nexora.Installer
         public const string RepoName = "Nexora-Skills-Manager";
         public const string DesktopZipName = "NexoraSkillsManager-1.0.0-win-x64.zip";
         public const string RuntimeZipName = "NexoraRuntime-1.0.0.zip";
-        public const string ExpectedDesktopSha = "88edae88834ef1e237291689045ef3b716e5d8d180228332e9790fb59312b773";
-        public const string ExpectedRuntimeSha = "f30113528b036bedcbadeb67291dd3172386ffe9388af987bee6f4b4ce6de816";
+        public const string ExpectedDesktopSha = "67b74c5d99c1f170fdaa0a4a7fc86b5ca1a9624723c625ca3ca7108f59ac0f23";
+        public const string ExpectedRuntimeSha = "1c06b3848baa14c3103c41de7c789f757bdc7093180d5c2db9f39fc31f49ee84";
 
         public static int Main(string[] args)
         {
