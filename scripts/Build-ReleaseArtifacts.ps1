@@ -129,7 +129,7 @@ $cscPath = "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
 $bootstrapperCs = Join-Path $RepoRoot "scripts\installer\NexoraInstallerBootstrapper.cs"
 
 if (Test-Path $cscPath) {
-    & $cscPath /target:winexe /out:"$installerExeTarget" /optimize+ "$bootstrapperCs" | Out-Null
+    & $cscPath /target:winexe /out:"$installerExeTarget" /r:"System.IO.Compression.FileSystem.dll" /optimize+ "$bootstrapperCs" | Out-Null
     if ($LASTEXITCODE -ne 0) {
         Write-Warning "Failed to compile installer bootstrapper executable. Exit code: $LASTEXITCODE"
     } else {
