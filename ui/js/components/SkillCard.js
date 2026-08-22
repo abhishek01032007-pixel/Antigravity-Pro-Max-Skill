@@ -13,7 +13,7 @@ export const SkillCard = {
             <span class="code-pill">${skill.id}</span>
           </div>
           <div class="flex items-center gap-2">
-            ${matchScore ? `<span style="font-size: var(--text-meta); color: var(--color-primary); font-weight: bold;">${matchScore}% Match</span>` : ''}
+            ${matchScore ? `<span style="font-size: var(--text-meta); color: var(--color-primary); font-weight: bold;">Score: ${matchScore}</span>` : ''}
             ${StatusBadge.render(skill.status || "Available")}
           </div>
         </div>

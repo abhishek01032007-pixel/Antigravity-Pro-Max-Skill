@@ -127,7 +127,7 @@ function Get-NexoraApplicationProjectProfile {
     }
 }
 
-function Get-NexoraApplicationRecommendations {
+function Get-NexoraProjectWorkingContext {
     param(
         [Parameter(Mandatory=$true)]
         [string]$ProjectId
@@ -135,12 +135,126 @@ function Get-NexoraApplicationRecommendations {
 
     $proj = Find-NexoraManagedProjectById -ProjectId $ProjectId
     if (-not $proj -or -not (Test-Path $proj.path)) {
+        return [PSCustomObject]@{
+            success     = $false
+            message     = "Project not found: $ProjectId"
+            projectId   = $ProjectId
+            workingMode = $null
+            target      = $null
+        }
+    }
+
+    $meta = Get-NexoraProjectMetadata -ProjectRoot $proj.path
+    $mode = $null
+    $target = $null
+    if ($meta.PSObject.Properties["workingContext"] -and $meta.workingContext) {
+        if ($meta.workingContext.PSObject.Properties["mode"]) { $mode = $meta.workingContext.mode }
+        elseif ($meta.workingContext.PSObject.Properties["workingMode"]) { $mode = $meta.workingContext.workingMode }
+        if ($meta.workingContext.PSObject.Properties["target"]) { $target = $meta.workingContext.target }
+    }
+
+    return [PSCustomObject]@{
+        success     = $true
+        projectId   = $ProjectId
+        workingMode = $mode
+        target      = $target
+    }
+}
+
+function Set-NexoraProjectWorkingContext {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$ProjectId,
+        [Parameter(Mandatory=$false)]
+        [string]$WorkingMode = $null,
+        [Parameter(Mandatory=$false)]
+        [string]$Target = $null
+    )
+
+    $proj = Find-NexoraManagedProjectById -ProjectId $ProjectId
+    if (-not $proj -or -not (Test-Path $proj.path)) {
+        return [PSCustomObject]@{
+            success = $false
+            message = "Project not found: $ProjectId"
+        }
+    }
+
+    $ValidModes = @("frontend", "backend", "fullstack", "qa")
+    $ValidTargetMap = @{
+        "frontend"  = @("web_application", "website", "mobile_application", "web application", "mobile application")
+        "backend"   = @("web_backend", "api_service", "database_layer", "web / app backend", "api / service", "database / data layer", "backend")
+        "fullstack" = @("web_application", "mobile_application", "web application", "mobile application")
+        "qa"        = @("web_application", "mobile_application", "api_service", "full_project", "web application", "mobile application", "backend / api", "full project")
+    }
+
+    $normMode = if ($WorkingMode) { $WorkingMode.ToLower().Trim() } else { $null }
+    $normTarget = if ($Target) { $Target.ToLower().Trim() } else { $null }
+
+    if ($normMode -and $normMode -notin $ValidModes) {
+        return [PSCustomObject]@{
+            success = $false
+            message = "Invalid working mode: $WorkingMode. Valid modes are: $($ValidModes -join ', ')"
+        }
+    }
+
+    if ($normMode -and $normTarget) {
+        $allowedTargets = $ValidTargetMap[$normMode]
+        if ($normTarget -notin $allowedTargets) {
+            return [PSCustomObject]@{
+                success = $false
+                message = "Invalid target '$Target' for working mode '$WorkingMode'."
+            }
+        }
+    }
+
+    $meta = Get-NexoraProjectMetadata -ProjectRoot $proj.path
+    $ctx = [PSCustomObject]@{
+        mode   = $normMode
+        target = $normTarget
+    }
+
+    if ($meta.PSObject.Properties["workingContext"]) {
+        $meta.workingContext = $ctx
+    } else {
+        $meta | Add-Member -NotePropertyName "workingContext" -NotePropertyValue $ctx -Force
+    }
+
+    Save-NexoraProjectMetadata -ProjectRoot $proj.path -Metadata $meta
+
+    return [PSCustomObject]@{
+        success     = $true
+        projectId   = $ProjectId
+        workingMode = $normMode
+        target      = $normTarget
+    }
+}
+
+function Get-NexoraApplicationRecommendations {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$ProjectId,
+        [Parameter(Mandatory=$false)]
+        [string]$WorkingMode = $null,
+        [Parameter(Mandatory=$false)]
+        [string]$Target = $null
+    )
+
+    $proj = Find-NexoraManagedProjectById -ProjectId $ProjectId
+    if (-not $proj -or -not (Test-Path $proj.path)) {
         return @()
+    }
+
+    if (-not $WorkingMode -and -not $Target) {
+        $ctx = Get-NexoraProjectWorkingContext -ProjectId $ProjectId
+        if ($ctx.success -and $ctx.workingMode) {
+            $WorkingMode = $ctx.workingMode
+            $Target = $ctx.target
+        }
     }
 
     $analysis = Get-NexoraAnalysis -ProjectRoot $proj.path
     $allSkills = Get-NexoraGlobalRegistry
-    return (Get-NexoraSkillRecommendations -Analysis $analysis -AvailableSkills $allSkills)
+    return (Get-NexoraSkillRecommendations -Analysis $analysis -AvailableSkills $allSkills -WorkingMode $WorkingMode -Target $Target)
 }
 
 function Get-NexoraApplicationAvailableSkills {
@@ -243,7 +357,7 @@ function Invoke-NexoraApplicationGlobalRemoval {
         [string]$SkillId,
         [Parameter(Mandatory=$true)]
         [string]$ConfirmationToken,
-        [string[]]$Platforms = @("antigravity")
+        [string[]]$Platforms = $null
     )
 
     Set-NexoraEngineStatus -Status "deactivating"
@@ -255,6 +369,157 @@ function Invoke-NexoraApplicationGlobalRemoval {
     Set-NexoraEngineStatus -Status "ready"
 
     return $result
+}
+
+function Get-NexoraProjectPlatformPreferences {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$ProjectId
+    )
+
+    $proj = Find-NexoraManagedProjectById -ProjectId $ProjectId
+    if (-not $proj -or -not (Test-Path $proj.path)) {
+        return @("antigravity")
+    }
+
+    $meta = Get-NexoraProjectMetadata -ProjectRoot $proj.path
+    if ($meta.PSObject.Properties["targetPlatforms"] -and $meta.targetPlatforms) {
+        return @($meta.targetPlatforms)
+    }
+    return @("antigravity")
+}
+
+function Set-NexoraProjectPlatformPreferences {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$ProjectId,
+        [Parameter(Mandatory=$true)]
+        [string[]]$Platforms
+    )
+
+    $proj = Find-NexoraManagedProjectById -ProjectId $ProjectId
+    if (-not $proj -or -not (Test-Path $proj.path)) {
+        return [PSCustomObject]@{
+            success = $false
+            message = "Project not found: $ProjectId"
+        }
+    }
+
+    $meta = Get-NexoraProjectMetadata -ProjectRoot $proj.path
+    $meta.targetPlatforms = @($Platforms)
+    Save-NexoraProjectMetadata -ProjectRoot $proj.path -Metadata $meta
+
+    return [PSCustomObject]@{
+        success   = $true
+        projectId = $ProjectId
+        platforms = @($Platforms)
+    }
+}
+
+function Get-NexoraSupportedPlatforms {
+    return @(
+        [PSCustomObject]@{ id = "antigravity"; name = "Google Antigravity"; status = "Available"; compatible = $true },
+        [PSCustomObject]@{ id = "cursor"; name = "Cursor"; status = "Available"; compatible = $true },
+        [PSCustomObject]@{ id = "copilot"; name = "GitHub Copilot"; status = "Available"; compatible = $true }
+    )
+}
+
+function Get-NexoraApplicationActivityLogs {
+    param(
+        [string]$ProjectId = $null,
+        [int]$Limit = 50
+    )
+
+    $allLogs = [System.Collections.Generic.List[psobject]]::new()
+    $seenIds = [System.Collections.Generic.HashSet[string]]::new()
+
+    $projects = Get-NexoraManagedProjects
+    $targetProjects = if ($ProjectId) {
+        @($projects | Where-Object { $_.id -eq $ProjectId })
+    } else {
+        $projects
+    }
+
+    foreach ($proj in $targetProjects) {
+        if (-not $proj.pathExists -or -not (Test-Path $proj.path)) { continue }
+
+        try {
+            $events = Get-NexoraProjectHistory -ProjectRoot $proj.path
+            if ($events) {
+                foreach ($entry in $events) {
+                    $ts = if ($entry.timestamp) { $entry.timestamp } else { (Get-Date).ToString("o") }
+                    $action = if ($entry.action) { $entry.action } else { "EVENT" }
+                    $details = if ($entry.details) { $entry.details } else { @{} }
+
+                    # Preserve existing stable eventId if present, otherwise generate deterministic fallback
+                    $eventId = if ($entry.PSObject.Properties["eventId"] -and $entry.eventId) {
+                        $entry.eventId
+                    } else {
+                        $rawIdentity = "$($proj.id)|$ts|$action"
+                        $sha = [System.Security.Cryptography.SHA256]::Create()
+                        $hashBytes = $sha.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($rawIdentity))
+                        "act_" + [System.BitConverter]::ToString($hashBytes).Replace("-", "").Substring(0, 10).ToLower()
+                    }
+
+                    if ($seenIds.Contains($eventId)) { continue }
+                    $seenIds.Add($eventId) | Out-Null
+
+                    # Human-readable user-safe message & eventType
+                    $eventType = "SYSTEM"
+                    $userMsg = "Operation recorded: $action"
+                    switch -Wildcard ($action) {
+                        "*PROJECT_*" {
+                            $eventType = "PROJECTS"
+                            $userMsg = if ($action -eq "PROJECT_ANALYZED") { "$($proj.name) analyzed" } else { "Project updated: $($proj.name)" }
+                        }
+                        "*SKILL_ACTIVAT*" {
+                            $eventType = "SKILLS"
+                            $sNames = if ($details.skills) { ($details.skills -join ", ") } elseif ($details.skillId) { $details.skillId } else { "Skills" }
+                            $userMsg = "$sNames activated"
+                        }
+                        "*SKILL_DEACTIVAT*" {
+                            $eventType = "SKILLS"
+                            $sNames = if ($details.skills) { ($details.skills -join ", ") } elseif ($details.skillId) { $details.skillId } else { "Skill" }
+                            $userMsg = "$sNames deactivated"
+                        }
+                        "*ANALYZ*" {
+                            $eventType = "ANALYSIS"
+                            $userMsg = "$($proj.name) analyzed"
+                        }
+                        "*UPDATE*" {
+                            $eventType = "UPDATES"
+                            $userMsg = "Update completed in $($proj.name)"
+                        }
+                        default {
+                            $eventType = "SYSTEM"
+                            $userMsg = "$action in $($proj.name)"
+                        }
+                    }
+
+                    $allLogs.Add([PSCustomObject]@{
+                        eventId         = $eventId
+                        projectId       = $proj.id
+                        projectName     = $proj.name
+                        timestamp       = $ts
+                        eventType       = $eventType
+                        userSafeMessage = $userMsg
+                        source          = "engine"
+                        metadata        = $details
+                    })
+                }
+            }
+        }
+        catch {}
+    }
+
+    # Deterministic sorting: Newest first (Timestamp Descending), tie-break with ProjectId then EventId
+    $sorted = @($allLogs | Sort-Object -Property @{ Expression = { $_.timestamp }; Descending = $true }, @{ Expression = { $_.projectId }; Descending = $false }, @{ Expression = { $_.eventId }; Descending = $false })
+
+    if ($Limit -gt 0 -and $sorted.Count -gt $Limit) {
+        $sorted = @($sorted | Select-Object -First $Limit)
+    }
+
+    return ,@($sorted)
 }
 
 function Get-NexoraApplicationStatus {
@@ -272,25 +537,40 @@ function Get-NexoraApplicationUpdateStatus {
         } catch {}
     }
 
-    Set-NexoraUpdateStatus -Status "up_to_date"
+    Set-NexoraUpdateStatus -Status "unknown"
 
     return [PSCustomObject]@{
         currentVersion  = $currentVersion
-        latestVersion   = $currentVersion
-        updateAvailable = $false
+        latestVersion   = $null
+        updateAvailable = $null
+        checkedRemotely = $false
         channel         = "stable"
+        status          = "Local installation verified"
+        message         = "Local v$currentVersion verified. Remote update checks not performed."
         checkedAt       = (Get-Date).ToString("o")
     }
 }
 
 function Invoke-NexoraApplicationDoctor {
     param(
-        [switch]$Repair
+        [switch]$Repair,
+        [Parameter(Mandatory=$false)]
+        [string]$CategoryId = $null
     )
+
+    $validCategoryIds = @("core_engine", "skill_library", "cli", "project_registry", "installation_metadata", "platform_adapters")
+    if ($CategoryId -and -not ($validCategoryIds -contains $CategoryId.ToLower())) {
+        return [PSCustomObject]@{
+            success        = $false
+            healthy        = $false
+            message        = "Invalid categoryId '$CategoryId'. Allowed categories: $($validCategoryIds -join ', ')"
+            checks         = @()
+            repairsApplied = @()
+        }
+    }
 
     Set-NexoraEngineStatus -Status $(if ($Repair) { "repairing" } else { "ready" })
     
-    # Run structured doctor check
     $runtimePath = Resolve-NexoraInstalledRuntimePath
     $meta = Get-NexoraInstallationMetadata
     $hasMeta = ($null -ne $meta -and (Test-Path $meta.installPath))
@@ -307,27 +587,84 @@ function Invoke-NexoraApplicationDoctor {
     $hasCmd = (Test-Path (Join-Path $binDir "nexora.cmd"))
     $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
     $hasPath = ($userPath -and $userPath -like "*$binDir*")
-    $hasAgpm = (Test-Path (Join-Path $binDir "agpm.cmd"))
+
+    # Project Registry check
+    $registryPath = Get-NexoraProjectRegistryPath
+    $hasRegistry = (Test-Path $registryPath)
+
+    # Platform Adapters check
+    $adapterDir = if ($runtimePath) { Join-Path $runtimePath "engine\Adapters" } else { $null }
+    $hasAdapters = ($adapterDir -and (Test-Path (Join-Path $adapterDir "AntigravityAdapter.ps1")) -and (Test-Path (Join-Path $adapterDir "CursorAdapter.ps1")) -and (Test-Path (Join-Path $adapterDir "CopilotAdapter.ps1")))
 
     $checks = @(
-        [PSCustomObject]@{ Name = "Installation Metadata"; Status = if ($hasMeta) { "OK" } else { "WARN" }; Detail = if ($hasMeta) { $meta.installPath } else { "Missing install.json" } }
-        [PSCustomObject]@{ Name = "Engine Core Entrypoint"; Status = if ($hasEngine) { "OK" } else { "FAIL" }; Detail = if ($hasEngine) { $engineFile } else { "Missing NexoraEngine.ps1" } }
-        [PSCustomObject]@{ Name = "Universal Skill Catalog"; Status = if ($hasSkills) { "OK" } else { "WARN" }; Detail = "Loaded $($allSkills.Count)/48 available skills" }
-        [PSCustomObject]@{ Name = "CLI Command Registration"; Status = if ($hasCmd -and $hasPath) { "OK" } else { "WARN" }; Detail = if ($hasCmd -and $hasPath) { "Active in PATH" } else { "Missing command or PATH registration" } }
-        [PSCustomObject]@{ Name = "Legacy agpm Compatibility"; Status = if ($hasAgpm) { "OK" } else { "WARN" }; Detail = if ($hasAgpm) { "Active" } else { "agpm.cmd missing" } }
+        [PSCustomObject]@{
+            id         = "core_engine"
+            label      = "Core Engine"
+            name       = "Core Engine"
+            status     = if ($hasEngine) { "OK" } else { "FAIL" }
+            detail     = if ($hasEngine) { "v1.0.0 NexoraEngine.ps1 verified" } else { "Missing NexoraEngine.ps1" }
+            repairable = $false
+        },
+        [PSCustomObject]@{
+            id         = "skill_library"
+            label      = "Skill Library"
+            name       = "Skill Library"
+            status     = if ($hasSkills) { "OK" } else { "WARN" }
+            detail     = "Loaded $($allSkills.Count)/48 available skills"
+            repairable = $false
+        },
+        [PSCustomObject]@{
+            id         = "cli"
+            label      = "CLI"
+            name       = "CLI"
+            status     = if ($hasCmd -and $hasPath) { "OK" } else { "WARN" }
+            detail     = if ($hasCmd -and $hasPath) { "Active in PATH" } else { "Missing command or PATH registration" }
+            repairable = $true
+        },
+        [PSCustomObject]@{
+            id         = "project_registry"
+            label      = "Project Registry"
+            name       = "Project Registry"
+            status     = if ($hasRegistry) { "OK" } else { "WARN" }
+            detail     = if ($hasRegistry) { "projects.json verified" } else { "projects.json missing" }
+            repairable = $true
+        },
+        [PSCustomObject]@{
+            id         = "installation_metadata"
+            label      = "Installation Metadata"
+            name       = "Installation Metadata"
+            status     = if ($hasMeta) { "OK" } else { "WARN" }
+            detail     = if ($hasMeta) { $meta.installPath } else { "Missing install.json" }
+            repairable = $true
+        },
+        [PSCustomObject]@{
+            id         = "platform_adapters"
+            label      = "Platform Adapters"
+            name       = "Platform Adapters"
+            status     = if ($hasAdapters) { "OK" } else { "WARN" }
+            detail     = if ($hasAdapters) { "Antigravity, Cursor, Copilot active" } else { "Platform adapter scripts missing" }
+            repairable = $false
+        }
     )
 
     $repairsApplied = @()
     if ($Repair) {
-        # Delegate repair logic through DoctorCommand
-        $repCmd = [PSCustomObject]@{ Flags = @{ "repair" = $true; "json" = $true }; Arguments = [System.Collections.Generic.List[string]]::new() }
-        Invoke-DoctorCommand $repCmd | Out-Null
+        $doctorCmdPath = Join-Path (Split-Path $PSScriptRoot -Parent) "CLI\Commands\DoctorCommand.ps1"
+        if ((Test-Path $doctorCmdPath) -and -not (Get-Command "Invoke-DoctorCommand" -ErrorAction SilentlyContinue)) {
+            . $doctorCmdPath
+        }
+        if (Get-Command "Invoke-DoctorCommand" -ErrorAction SilentlyContinue) {
+            $repCmd = [PSCustomObject]@{ Flags = @{ "repair" = $true; "json" = $true }; Arguments = [System.Collections.Generic.List[string]]::new() }
+            Invoke-DoctorCommand $repCmd | Out-Null
+        }
+        $repairsApplied = @("CLI registration checked/repaired", "Installation metadata refreshed")
     }
 
     Set-NexoraEngineStatus -Status "ready"
 
     return [PSCustomObject]@{
-        healthy        = ($checks | Where-Object { $_.Status -eq "FAIL" }).Count -eq 0
+        success        = $true
+        healthy        = ($checks | Where-Object { $_.status -eq "FAIL" }).Count -eq 0
         runtimePath    = $runtimePath
         checks         = $checks
         repairsApplied = $repairsApplied

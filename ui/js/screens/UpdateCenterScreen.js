@@ -1,20 +1,34 @@
 /**
- * UpdateCenterScreen.js - Update Center & Module Management Screen (Extended Phase 6.1B)
- * Full 13A-13J simulation without persisting version mutations across reloads.
+ * UpdateCenterScreen.js - Update Center & Local Module Management (Phase 6.2 Gate 9 Integrated)
+ * Truthful local-only presentation in LIVE mode, preserving Phase 6.1 simulation in Mock mode.
  */
 import { SectionHeader } from '../components/SectionHeader.js';
 import { UpdateModuleCard } from '../components/UpdateModuleCard.js';
 import { StatusBadge } from '../components/StatusBadge.js';
 
 export const UpdateCenterScreen = {
-  render(data) {
-    const modules = data.updateModules;
+  render(data, params = {}) {
+    const isLive = !!data.isLiveMode;
+    const updateStatus = isLive ? (params.updateStatus || { currentVersion: 'v1.0.0', channel: 'stable', status: 'Local installation verified' }) : {
+      currentVersion: 'v1.0.0',
+      channel: 'stable',
+      status: 'Up to date'
+    };
+    const modules = isLive ? (params.updateModules || []) : (data.updateModules || []);
+
+    const curVer = updateStatus.currentVersion || 'v1.0.0';
+    const channel = (updateStatus.channel || 'stable').toUpperCase();
 
     return `
       <div class="content-container">
         ${SectionHeader.render({
           title: "Update Center",
-          actionsHtml: `
+          actionsHtml: isLive ? `
+            <button class="btn btn-secondary btn-sm" id="btn-update-refresh">
+              <span class="material-symbols-outlined" style="font-size: 16px;">refresh</span>
+              <span>Refresh Status</span>
+            </button>
+          ` : `
             <button class="btn btn-secondary" id="btn-launch-update-flow">
               <span class="material-symbols-outlined" style="font-size: 16px;">system_update</span>
               <span>Simulate Nexora v1.1.0 Update</span>
@@ -33,14 +47,14 @@ export const UpdateCenterScreen = {
               <span class="material-symbols-outlined" style="font-size: 20px;">deployed_code</span>
             </div>
             <div class="flex flex-col">
-              <span style="font-size: var(--text-body-md); font-weight: 700; color: var(--color-on-surface);">Nexora Skills Manager v1.0.0</span>
+              <span style="font-size: var(--text-body-md); font-weight: 700; color: var(--color-on-surface);">Nexora Skills Manager ${curVer}</span>
               <span style="font-size: var(--text-meta); color: var(--color-on-surface-variant);" id="update-status-subtitle">
-                All components and skill packages are on the verified stable release.
+                ${isLive ? `Channel: ${channel} | Remote update check: Not performed (Local offline verification only)` : 'All components and skill packages are on the verified stable release.'}
               </span>
             </div>
           </div>
           <div id="update-status-badge-container">
-            ${StatusBadge.render("Up to date")}
+            ${StatusBadge.render(isLive ? "Local Verified" : "Up to date")}
           </div>
         </div>
 
@@ -56,11 +70,14 @@ export const UpdateCenterScreen = {
     `;
   },
   attachEvents(app) {
+    document.getElementById('btn-update-refresh')?.addEventListener('click', () => {
+      app.refreshLocalUpdateStatus();
+    });
+
     document.getElementById('btn-check-updates-now')?.addEventListener('click', () => {
       app.showToast("Checked for updates: all modules are up to date.");
     });
 
-    // Item 13: Launch Full Update Wizard Flow (13A -> 13C -> 13D -> 13E -> 13G)
     document.getElementById('btn-launch-update-flow')?.addEventListener('click', () => {
       app.startAppUpdateFlow();
     });

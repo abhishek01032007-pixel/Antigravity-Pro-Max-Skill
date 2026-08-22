@@ -313,5 +313,201 @@ export const WorkflowDialog = {
         </div>
       </div>
     `;
+  },
+
+  // Item 8: Protected Global Removal Confirmation Dialog
+  renderGlobalRemovalConfirmation({ skillId, affectedProjectCount = 0, affectedProjects = [] }) {
+    const isZero = affectedProjectCount === 0;
+
+    return `
+      <div class="modal-backdrop" id="modal-container">
+        <div class="modal-dialog" style="max-width: 520px;">
+          <div class="modal-header">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined" style="color: var(--color-error-accent); font-size: 20px;">delete_sweep</span>
+              <h3 style="font-size: var(--text-section-header); font-weight: 600; color: var(--color-on-surface);">Remove Skill From All Projects</h3>
+            </div>
+            <button class="btn-ghost" id="modal-close-btn" style="width: 24px; height: 24px; padding: 0;">
+              <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <p style="font-size: var(--text-body-sm); color: var(--color-on-surface-variant); line-height: 1.5;">
+              ${isZero
+                ? `This skill is not active in any managed project.`
+                : `This will deactivate <strong>${skillId}</strong> from <strong>${affectedProjectCount}</strong> managed project(s) and remove all deployed platform rule and skill files.`}
+            </p>
+
+            <div class="card" style="padding: var(--space-3); background-color: var(--color-surface-container); margin-top: var(--space-2);">
+              <div class="flex items-center justify-between">
+                <span style="font-size: var(--text-meta); color: var(--color-outline);">Target Skill:</span>
+                <span class="code-pill">${skillId}</span>
+              </div>
+              <div class="flex items-center justify-between" style="margin-top: 4px;">
+                <span style="font-size: var(--text-meta); color: var(--color-outline);">Affected Projects:</span>
+                <span style="font-size: var(--text-body-sm); font-weight: 600; color: var(--color-on-surface);">${affectedProjectCount} Projects</span>
+              </div>
+            </div>
+
+            ${!isZero && affectedProjects.length > 0 ? `
+              <div class="flex flex-col gap-1" style="margin-top: var(--space-2);">
+                <span style="font-size: var(--text-meta); color: var(--color-outline); font-weight: 600;">
+                  Impacted Project Workspaces:
+                </span>
+                <div class="flex flex-col gap-1" style="max-height: 140px; overflow-y: auto; padding: var(--space-2); background-color: var(--color-surface-lowest); border: 1px solid var(--color-outline-variant); border-radius: var(--radius-sm);">
+                  ${affectedProjects.map(p => `
+                    <div class="flex items-center justify-between text-muted" style="font-size: var(--text-meta); padding: 2px 0;">
+                      <span>${p.name || p}</span>
+                      <span class="badge badge-neutral">Active</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+            <button class="btn btn-destructive" id="btn-confirm-remove-all" ${isZero ? 'disabled' : ''}>
+              Confirm Removal
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  // Item 9: Global Removal Result Dialog
+  renderGlobalRemovalResult({ status = "success", skillId = "", totalAffected = 0, succeededCount = 0, failedCount = 0, projectResults = [] }) {
+    const isSuccess = status === "success";
+    const isPartial = status === "partial";
+
+    return `
+      <div class="modal-backdrop" id="modal-container">
+        <div class="modal-dialog" style="max-width: 520px;">
+          <div class="modal-header">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined" style="color: ${isSuccess ? 'var(--color-success)' : (isPartial ? 'var(--color-warning)' : 'var(--color-error-accent)')}; font-size: 20px;">
+                ${isSuccess ? 'check_circle' : (isPartial ? 'warning' : 'error')}
+              </span>
+              <h3 style="font-size: var(--text-section-header); font-weight: 600; color: var(--color-on-surface);">
+                ${isSuccess ? 'Global Removal Completed' : (isPartial ? 'Global Removal Partially Completed' : 'Global Removal Failed')}
+              </h3>
+            </div>
+            <button class="btn-ghost" id="modal-close-btn" style="width: 24px; height: 24px; padding: 0;">
+              <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <p style="font-size: var(--text-body-sm); color: var(--color-on-surface-variant);">
+              ${isSuccess
+                ? `Successfully removed ${skillId} from all ${succeededCount} managed projects.`
+                : (isPartial ? `Removed ${skillId} from ${succeededCount} of ${totalAffected} projects. ${failedCount} projects failed.` : `Failed to remove ${skillId} from managed projects.`)}
+            </p>
+
+            ${projectResults.length > 0 ? `
+              <div class="flex flex-col gap-1" style="margin-top: var(--space-2); max-height: 160px; overflow-y: auto;">
+                ${projectResults.map(p => `
+                  <div class="flex items-center justify-between card" style="padding: var(--space-2) var(--space-3); background-color: var(--color-surface-container);">
+                    <span style="font-size: var(--text-body-sm); font-weight: 500; color: var(--color-on-surface);">${p.name || p.projectId}</span>
+                    <span class="badge ${p.success ? 'badge-success' : 'badge-error'}">${p.success ? 'Removed' : 'Failed'}</span>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn btn-primary" id="btn-global-result-done">Done</button>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  // Item 10: Health Check Repair Confirmation Dialog
+  renderHealthRepairConfirmation({ categoryId = null, categoryName = "All Diagnostic Warnings", detail = "" }) {
+    return `
+      <div class="modal-backdrop" id="modal-container">
+        <div class="modal-dialog" style="max-width: 520px;">
+          <div class="modal-header">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined" style="color: var(--color-warning); font-size: 20px;">healing</span>
+              <h3 style="font-size: var(--text-section-header); font-weight: 600; color: var(--color-on-surface);">Confirm Diagnostic Repair</h3>
+            </div>
+            <button class="btn-ghost" id="modal-close-btn" style="width: 24px; height: 24px; padding: 0;">
+              <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <p style="font-size: var(--text-body-sm); color: var(--color-on-surface-variant); line-height: 1.5;">
+              Nexora will attempt to repair <strong>${categoryName}</strong>. This may modify Nexora-managed local configuration or metadata.
+            </p>
+
+            ${detail ? `
+              <div class="card" style="padding: var(--space-3); background-color: var(--color-surface-container); margin-top: var(--space-2);">
+                <span style="font-size: var(--text-meta); color: var(--color-outline);">Reported Issue:</span>
+                <p style="font-size: var(--text-body-sm); color: var(--color-on-surface); margin-top: 4px;">${detail}</p>
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+            <button class="btn btn-primary" id="btn-confirm-health-repair" data-id="${categoryId || ''}">
+              Repair Now
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  // Item 11: Health Check Repair Result Dialog
+  renderHealthRepairResult({ success = true, repairsApplied = [], message = "" }) {
+    return `
+      <div class="modal-backdrop" id="modal-container">
+        <div class="modal-dialog" style="max-width: 520px;">
+          <div class="modal-header">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined" style="color: ${success ? 'var(--color-success)' : 'var(--color-error-accent)'}; font-size: 20px;">
+                ${success ? 'check_circle' : 'error'}
+              </span>
+              <h3 style="font-size: var(--text-section-header); font-weight: 600; color: var(--color-on-surface);">
+                ${success ? 'Diagnostic Repair Completed' : 'Diagnostic Repair Failed'}
+              </h3>
+            </div>
+            <button class="btn-ghost" id="modal-close-btn" style="width: 24px; height: 24px; padding: 0;">
+              <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <p style="font-size: var(--text-body-sm); color: var(--color-on-surface-variant);">
+              ${message || (success ? 'Diagnostic repairs applied successfully.' : 'Failed to apply diagnostic repairs.')}
+            </p>
+
+            ${repairsApplied.length > 0 ? `
+              <div class="flex flex-col gap-1" style="margin-top: var(--space-2);">
+                <span style="font-size: var(--text-meta); color: var(--color-outline); font-weight: 600;">Applied Fixes:</span>
+                ${repairsApplied.map(r => `
+                  <div class="flex items-center gap-2 card" style="padding: var(--space-2) var(--space-3); background-color: var(--color-surface-container);">
+                    <span class="material-symbols-outlined" style="font-size: 16px; color: var(--color-success);">check</span>
+                    <span style="font-size: var(--text-body-sm); color: var(--color-on-surface);">${r}</span>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn btn-primary" id="btn-health-repair-done">Done</button>
+          </div>
+        </div>
+      </div>
+    `;
   }
 };

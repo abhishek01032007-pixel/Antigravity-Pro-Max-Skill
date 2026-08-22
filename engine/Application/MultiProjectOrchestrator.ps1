@@ -41,8 +41,9 @@ function Get-NexoraCrossProjectSkillUsage {
 
 function New-NexoraProjectSetFingerprint {
     param(
-        [Parameter(Mandatory=$true)]
-        [string[]]$ProjectIds
+        [Parameter(Mandatory=$false)]
+        [AllowEmptyCollection()]
+        [string[]]$ProjectIds = @()
     )
     $sorted = @($ProjectIds | Sort-Object -Unique)
     $joined = $sorted -join "|"
@@ -96,7 +97,7 @@ function Invoke-NexoraGlobalSkillRemoval {
         [string]$SkillId,
         [Parameter(Mandatory=$true)]
         [string]$ConfirmationToken,
-        [string[]]$Platforms = @("antigravity")
+        [string[]]$Platforms = $null
     )
 
     $normalizedSkillId = $SkillId.ToLower()
@@ -166,7 +167,17 @@ function Invoke-NexoraGlobalSkillRemoval {
 
     foreach ($proj in $currentAffected) {
         try {
-            $deactResult = Deactivate-NexoraSkills -ProjectRoot $proj.path -SkillIds @($SkillId) -Platforms $Platforms
+            $projPlatforms = if ($Platforms -and $Platforms.Count -gt 0 -and $Platforms[0] -ne "authoritative") {
+                $Platforms
+            } else {
+                $pMeta = Get-NexoraProjectMetadata -ProjectRoot $proj.path
+                if ($pMeta.PSObject.Properties["targetPlatforms"] -and $pMeta.targetPlatforms) {
+                    @($pMeta.targetPlatforms)
+                } else {
+                    @("antigravity")
+                }
+            }
+            $deactResult = Deactivate-NexoraSkills -ProjectRoot $proj.path -SkillIds @($SkillId) -Platforms $projPlatforms
             if ($deactResult.Success) {
                 $successCount++
                 $results.Add([PSCustomObject]@{

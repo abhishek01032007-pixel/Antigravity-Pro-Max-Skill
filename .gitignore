@@ -1,6 +1,8 @@
 # Local / development files
 Test-Project/
 Backup/
+node_modules/
+npm-debug.log*
 
 # IDE settings
 .vscode/

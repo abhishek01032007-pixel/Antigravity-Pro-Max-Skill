@@ -1,0 +1,21 @@
+{
+  "name": "nexora-desktop",
+  "version": "1.0.0",
+  "description": "Nexora Skills Manager Desktop Host",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node tests/bridge-protocol.test.js"
+  },
+  "keywords": [
+    "nexora",
+    "skills",
+    "ai",
+    "desktop"
+  ],
+  "author": "Nexora Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "33.2.1"
+  }
+}

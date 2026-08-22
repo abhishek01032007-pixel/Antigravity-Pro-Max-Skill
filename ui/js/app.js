@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * NEXORA SKILLS MANAGER - MAIN APP CONTROLLER (app.js)
- * Coordinates Client-Side Navigation, Shell Rendering, Workflows & Modals
+ * Phase 6.2 Gate 3: Live Application Lifecycle + Status Integration
  * ============================================================================
  */
 
@@ -31,7 +31,7 @@ import { UpdateCenterScreen } from './screens/UpdateCenterScreen.js';
 class NexoraApp {
   constructor() {
     this.data = BridgeService;
-    this.currentView = "dashboard";
+    this.currentView = "startup";
     this.viewParams = {};
     this.screens = {
       "startup": StartupScreen,
@@ -59,13 +59,40 @@ class NexoraApp {
 
     // Render Shell with initial state
     root.innerHTML = NexoraAppShell.render(this.currentView, {
-      isOffline: this.data.state.isOffline,
-      hasUpdate: this.data.state.appUpdateAvailable && !this.data.state.updateDismissed
+      isOffline: this.data.state ? !!this.data.state.isOffline : false,
+      hasUpdate: this.data.state ? (!!this.data.state.appUpdateAvailable && !this.data.state.updateDismissed) : false
     });
     this.attachShellEvents();
 
-    // Route to default view (Dashboard)
-    await this.navigate("dashboard");
+    // Start live startup lifecycle
+    await this.runStartupFlow();
+  }
+
+  async runStartupFlow() {
+    if (this.isInitializing) return this.initPromise;
+    this.isInitializing = true;
+
+    this.initPromise = (async () => {
+      await this.navigate("startup", { status: "initializing" });
+
+      try {
+        const initRes = await this.data.initialize();
+        if (initRes && initRes.success) {
+          await this.data.getStatus();
+          this.refreshShell();
+          await this.navigate("startup", { status: "ready" });
+        } else {
+          const err = (initRes && initRes.error) || { message: "Failed to initialize Nexora backend engine.", code: "INITIALIZATION_FAILED" };
+          await this.navigate("startup", { status: "error", errorMsg: err.message, errorCode: err.code });
+        }
+      } catch (err) {
+        await this.navigate("startup", { status: "error", errorMsg: err.message || "Bridge communication error.", errorCode: "BRIDGE_UNAVAILABLE" });
+      } finally {
+        this.isInitializing = false;
+      }
+    })();
+
+    return this.initPromise;
   }
 
   attachShellEvents() {
@@ -83,10 +110,12 @@ class NexoraApp {
       btn.addEventListener('click', () => this.navigate('platform-selection'));
     });
 
-    // Mock Offline Toggle
+    // Offline Toggle
     document.getElementById('btn-topbar-offline-toggle')?.addEventListener('click', () => {
-      const isOff = this.data.toggleOffline();
-      this.showToast(isOff ? "Mock Offline Mode enabled." : "Mock Offline Mode disabled. Online.");
+      if (this.data.toggleOffline) {
+        const isOff = this.data.toggleOffline();
+        this.showToast(isOff ? "Offline Mode enabled." : "Offline Mode disabled. Online.");
+      }
       this.refreshShell();
       this.navigate(this.currentView);
     });
@@ -98,11 +127,18 @@ class NexoraApp {
   }
 
   refreshShell() {
+    if (typeof document === 'undefined') return;
     const root = document.getElementById('app-root');
     if (!root) return;
+
+    let statusPillText = '● Healthy | Up to date';
+    if (this.data.getStatusPillText) {
+      statusPillText = this.data.getStatusPillText();
+    }
+
     root.innerHTML = NexoraAppShell.render(this.currentView, {
-      isOffline: this.data.state.isOffline,
-      hasUpdate: this.data.state.appUpdateAvailable && !this.data.state.updateDismissed
+      isOffline: this.data.state ? !!this.data.state.isOffline : false,
+      hasUpdate: this.data.state ? (!!this.data.state.appUpdateAvailable && !this.data.state.updateDismissed) : false
     });
     this.attachShellEvents();
   }
@@ -111,24 +147,92 @@ class NexoraApp {
     this.currentView = viewName;
     this.viewParams = params;
 
-    // Update active nav state in sidebar
-    document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
-      const navKey = item.getAttribute('data-nav');
-      if (navKey === viewName || (viewName === 'skill-library' && navKey === 'skills') || (viewName === 'project-analysis' && navKey === 'projects') || (viewName === 'platform-selection' && navKey === 'settings')) {
-        item.classList.add('active');
-      } else {
-        item.classList.remove('active');
+    if (typeof document !== 'undefined') {
+      // Update active nav state in sidebar
+      document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
+        const navKey = item.getAttribute('data-nav');
+        if (navKey === viewName || (viewName === 'skill-library' && navKey === 'skills') || (viewName === 'project-analysis' && navKey === 'projects') || (viewName === 'platform-selection' && navKey === 'settings')) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+
+      const outlet = document.getElementById('canvas-outlet');
+      if (outlet) {
+        let renderParams = { ...params };
+        if (this.data.isLiveMode) {
+          if (!renderParams.projectsList && this.data.getProjectsList) {
+            const liveProjects = await this.data.getProjectsList();
+            renderParams.projectsList = liveProjects;
+          }
+          if (renderParams.projectsList && renderParams.projectsList.length > 0 && !renderParams.activeProject) {
+            renderParams.activeProject = renderParams.projectsList[0];
+          }
+          if (renderParams.activeProject && !renderParams.workingContext && this.data.getWorkingContext) {
+            renderParams.workingContext = await this.data.getWorkingContext(renderParams.activeProject.projectId);
+            renderParams.workingMode = renderParams.workingContext.workingMode;
+            renderParams.target = renderParams.workingContext.target;
+          }
+          if (renderParams.activeProject && !renderParams.recommendations && this.data.getRecommendedSkills) {
+            renderParams.recommendations = await this.data.getRecommendedSkills(
+              renderParams.activeProject.projectId,
+              renderParams.workingMode,
+              renderParams.target
+            );
+          }
+          if (viewName === 'skill-library' && !renderParams.catalog && this.data.getSkillCatalog) {
+            renderParams.catalog = await this.data.getSkillCatalog();
+          }
+          if (viewName === 'active-skills' && renderParams.activeProject && !renderParams.activeSkills && this.data.getActiveSkills) {
+            renderParams.activeSkills = await this.data.getActiveSkills(renderParams.activeProject.projectId);
+          }
+          if (viewName === 'platform-selection' && renderParams.activeProject) {
+            if (!renderParams.platforms && this.data.getPlatformsList) {
+              renderParams.platforms = await this.data.getPlatformsList();
+            }
+            if (!renderParams.savedPlatforms && this.data.getPlatformPreferences) {
+              renderParams.savedPlatforms = await this.data.getPlatformPreferences(renderParams.activeProject.projectId);
+            }
+          }
+          if (viewName === 'skill-detail' && renderParams.activeProject) {
+            if (!renderParams.catalog && this.data.getSkillCatalog) renderParams.catalog = await this.data.getSkillCatalog();
+            if (!renderParams.activeSkills && this.data.getActiveSkills) renderParams.activeSkills = await this.data.getActiveSkills(renderParams.activeProject.projectId);
+          }
+          if (viewName === 'cross-project') {
+            const sId = renderParams.skillId || (params && params.skillId) || 'flutter-build-responsive-layout';
+            renderParams.skillId = sId;
+            if (!renderParams.usage && this.data.getSkillUsage) {
+              renderParams.usage = await this.data.getSkillUsage(sId);
+            }
+          }
+          if (viewName === 'system-health') {
+            if (!renderParams.health && this.data.getHealthChecks) {
+              renderParams.health = await this.data.getHealthChecks();
+            }
+          }
+          if (viewName === 'recent-activity') {
+            if (!renderParams.activityLogs && this.data.getActivityLogs) {
+              renderParams.activityLogs = await this.data.getActivityLogs();
+            }
+          }
+          if (viewName === 'update-center') {
+            if (!renderParams.updateStatus && this.data.getUpdateStatus) {
+              renderParams.updateStatus = await this.data.getUpdateStatus();
+            }
+            if (!renderParams.updateModules && this.data.getUpdateModules) {
+              renderParams.updateModules = await this.data.getUpdateModules();
+            }
+          }
+        }
+
+        const screen = this.screens[viewName] || DashboardScreen;
+        outlet.innerHTML = screen.render(this.data, renderParams);
+
+        if (screen.attachEvents) {
+          screen.attachEvents(this);
+        }
       }
-    });
-
-    const outlet = document.getElementById('canvas-outlet');
-    if (!outlet) return;
-
-    const screen = this.screens[viewName] || DashboardScreen;
-    outlet.innerHTML = screen.render(this.data, params);
-
-    if (screen.attachEvents) {
-      screen.attachEvents(this);
     }
   }
 
@@ -140,378 +244,417 @@ class NexoraApp {
     let selectedModeId = null;
     let selectedModeTitle = null;
 
-    const html = WorkflowDialog.renderModeSelection(
-      this.data.sampleProject.type,
-      this.data.state.currentWorkingMode
-    );
+    const sampleType = (this.data.sampleProject && this.data.sampleProject.type) || "Full Stack Application";
+    const currentMode = (this.data.state && this.data.state.currentWorkingMode) || null;
 
+    const html = WorkflowDialog.renderModeSelection(sampleType, currentMode);
     this.renderModal(html);
 
-    // Card selection event
-    document.querySelectorAll('.mode-option-card').forEach(card => {
+    document.querySelectorAll('.card-mode-option, .mode-option-card').forEach(card => {
       card.addEventListener('click', () => {
-        document.querySelectorAll('.mode-option-card').forEach(c => {
-          c.classList.remove('card-selected');
-          c.querySelector('.mode-check-icon').style.display = 'none';
-        });
-        card.classList.add('card-selected');
-        card.querySelector('.mode-check-icon').style.display = 'inline-block';
-
+        document.querySelectorAll('.card-mode-option, .mode-option-card').forEach(c => c.style.borderColor = 'var(--color-outline-variant)');
+        card.style.borderColor = 'var(--color-primary)';
         selectedModeId = card.getAttribute('data-mode-id');
         selectedModeTitle = card.getAttribute('data-mode-title');
-        const continueBtn = document.getElementById('btn-mode-continue');
-        if (continueBtn) continueBtn.removeAttribute('disabled');
+        const nextBtn = document.getElementById('btn-wizard-next') || document.getElementById('btn-mode-continue');
+        if (nextBtn) nextBtn.disabled = false;
       });
     });
 
-    // Continue to Target Selection (Step 2)
-    document.getElementById('btn-mode-continue')?.addEventListener('click', () => {
-      if (selectedModeId && selectedModeTitle) {
+    const handleNext = () => {
+      if (selectedModeId) {
         this.startTargetSelectionWizard(selectedModeId, selectedModeTitle);
       }
-    });
+    };
+
+    document.getElementById('btn-wizard-next')?.addEventListener('click', handleNext);
+    document.getElementById('btn-mode-continue')?.addEventListener('click', handleNext);
+    document.getElementById('btn-wizard-cancel')?.addEventListener('click', () => this.closeModal());
+    document.getElementById('modal-cancel-btn')?.addEventListener('click', () => this.closeModal());
+    document.getElementById('modal-close-btn')?.addEventListener('click', () => this.closeModal());
   }
 
   startTargetSelectionWizard(modeId, modeTitle) {
-    const targets = this.data.getDevelopmentTargets(modeId);
     let selectedTarget = null;
+    const targetMap = {
+      "frontend": ["Web Application", "Website", "Mobile Application"],
+      "backend": ["Web/App Backend", "API/Service", "Database/Data Layer"],
+      "fullstack": ["Web Application", "Mobile Application"],
+      "qa": ["Web Application", "Mobile Application", "Backend/API", "Full Project"]
+    };
+    const targets = targetMap[modeId] || (this.data.getDevelopmentTargets ? this.data.getDevelopmentTargets(modeId) : ["Web Application"]);
 
-    const html = WorkflowDialog.renderTargetSelection(modeTitle, targets, selectedTarget);
+    const html = WorkflowDialog.renderTargetSelection(modeTitle, targets);
     this.renderModal(html);
 
-    document.querySelectorAll('.target-option-card').forEach(card => {
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.target-option-card').forEach(c => {
-          c.classList.remove('card-selected');
-          c.querySelector('.target-check-icon').style.display = 'none';
+    document.querySelectorAll('.chip-target-option, .target-option-card, .card-target-option').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.chip-target-option, .target-option-card, .card-target-option').forEach(c => {
+          c.style.borderColor = 'var(--color-outline-variant)';
+          c.style.backgroundColor = 'transparent';
         });
-        card.classList.add('card-selected');
-        card.querySelector('.target-check-icon').style.display = 'inline-block';
-
-        selectedTarget = card.getAttribute('data-target-name');
-        const continueBtn = document.getElementById('btn-target-continue');
-        if (continueBtn) continueBtn.removeAttribute('disabled');
+        chip.style.borderColor = 'var(--color-primary)';
+        chip.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
+        selectedTarget = chip.getAttribute('data-target');
+        const confirmBtn = document.getElementById('btn-wizard-confirm') || document.getElementById('btn-target-confirm');
+        if (confirmBtn) confirmBtn.disabled = false;
       });
     });
 
-    document.getElementById('btn-target-back')?.addEventListener('click', () => {
-      this.startModeSelectionWizard();
-    });
-
-    document.getElementById('btn-target-continue')?.addEventListener('click', () => {
+    const handleConfirm = async () => {
       if (selectedTarget) {
-        // If mode is changing from an already configured mode -> Show Change Confirmation (Item 3)
-        if (this.data.state.currentWorkingMode && this.data.state.currentWorkingMode !== modeTitle) {
-          this.showChangeModeConfirmation(modeTitle, selectedTarget);
-        } else {
-          this.applyWorkingMode(modeTitle, selectedTarget);
-        }
+        this.showRecalculationLoader(modeId, modeTitle, selectedTarget);
       }
-    });
+    };
+
+    document.getElementById('btn-wizard-confirm')?.addEventListener('click', handleConfirm);
+    document.getElementById('btn-target-confirm')?.addEventListener('click', handleConfirm);
+    document.getElementById('btn-wizard-back')?.addEventListener('click', () => this.startModeSelectionWizard());
+    document.getElementById('modal-cancel-btn')?.addEventListener('click', () => this.closeModal());
+    document.getElementById('modal-close-btn')?.addEventListener('click', () => this.closeModal());
   }
 
-  showChangeModeConfirmation(newMode, newTarget) {
-    const html = WorkflowDialog.renderChangeModeConfirmation({
-      currentMode: this.data.state.currentWorkingMode,
-      currentTarget: this.data.state.currentTarget,
-      newMode: newMode,
-      newTarget: newTarget
-    });
-
+  async showRecalculationLoader(modeId, modeTitle, targetName) {
+    const html = InlineNotice.renderRecalculationLoader(modeTitle, targetName);
     this.renderModal(html);
 
-    document.getElementById('btn-apply-change-mode')?.addEventListener('click', () => {
-      this.applyWorkingMode(newMode, newTarget);
-    });
-  }
-
-  applyWorkingMode(modeTitle, targetName) {
-    this.data.setWorkingMode(modeTitle, targetName);
-    this.closeModal();
-    this.showToast(`Working Mode set to ${modeTitle} (${targetName}).`);
-
-    // Route to Recommended Skills with inline recalculation loader (Item 4)
-    this.navigate('recommended-skills');
-
-    setTimeout(() => {
-      const loaderOutlet = document.getElementById('rec-recalc-outlet');
-      const list = document.getElementById('recommended-skills-list');
-      if (loaderOutlet && list) {
-        loaderOutlet.innerHTML = InlineNotice.renderRecalculationLoader(modeTitle, targetName);
-        loaderOutlet.classList.remove('hidden');
-        list.classList.add('hidden');
-
-        setTimeout(() => {
-          loaderOutlet.classList.add('hidden');
-          list.classList.remove('hidden');
-        }, 700);
+    setTimeout(async () => {
+      if (this.data.isLiveMode && this.data.setWorkingContext) {
+        const targetBackendIdMap = {
+          "Web Application": "web_application",
+          "Website": "website",
+          "Mobile Application": "mobile_application",
+          "Web/App Backend": "web_backend",
+          "API/Service": "api_service",
+          "Database/Data Layer": "database_layer",
+          "Backend/API": "api_service",
+          "Full Project": "full_project"
+        };
+        const backendTargetId = targetBackendIdMap[targetName] || targetName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        await this.data.setWorkingContext(null, modeId, backendTargetId);
+      } else if (this.data.setWorkingMode) {
+        await this.data.setWorkingMode(modeTitle, targetName);
       }
-    }, 50);
+
+      this.closeModal();
+      this.showToast(`Working Mode updated to ${modeTitle} (${targetName}). Recommendations recalculated.`);
+      this.navigate('dashboard');
+    }, 600);
+  }
+
+  startAppUpdateFlow() {
+    const html = UpdateProgressModal.renderAppUpdateModal("v1.1.0", "14.2 MB");
+    this.renderModal(html);
+
+    document.getElementById('btn-update-now')?.addEventListener('click', () => {
+      document.getElementById('update-action-footer').innerHTML = `
+        <div class="flex items-center gap-2 text-primary" style="font-size: var(--text-body-sm);">
+          <span class="material-symbols-outlined spin">sync</span>
+          <span>Downloading update package... (45%)</span>
+        </div>
+      `;
+      setTimeout(() => {
+        if (this.data.state) this.data.state.appUpdateAvailable = false;
+        this.closeModal();
+        this.showToast("Nexora Desktop updated successfully to v1.1.0!");
+        this.refreshShell();
+      }, 2000);
+    });
+
+    document.getElementById('btn-update-later')?.addEventListener('click', () => this.closeModal());
   }
 
   // =========================================================================
-  // WORKFLOW ITEM 5: SIDE SHEET CATALOG SEARCH & ADD DRAWER
+  // GATE 6: EXPLICIT ACTIVATION & DEACTIVATION MODAL HANDLERS
   // =========================================================================
 
-  openCatalogSideSheet() {
-    this.closeSideSheet();
-    const div = document.createElement('div');
-    div.id = 'active-side-sheet-wrapper';
-    div.innerHTML = SideSheet.render({
-      title: "Add Compatible Skills",
-      catalog: this.data.skillCatalog
-    });
-    document.body.appendChild(div);
+  async showActivationConfirmationModal() {
+    const proj = (this.viewParams && this.viewParams.activeProject) || (this.data.sampleProject ? this.data.sampleProject : { name: "Current Project", type: "Full Stack" });
+    const mode = (this.viewParams && this.viewParams.workingMode) || (this.data.state && this.data.state.currentWorkingMode) || "General";
+    const target = (this.viewParams && this.viewParams.target) || (this.data.state && this.data.state.currentTarget) || "Default";
+    const selectedSkills = (this.data.state && this.data.state.selectedSkillIds) || [];
+    const selectedPlatforms = (this.data.state && this.data.state.selectedPlatforms) || ["Google Antigravity", "Cursor"];
+    const selectedPlatformIds = (this.data.state && this.data.state.selectedPlatformIds) || ["antigravity", "cursor"];
 
-    document.getElementById('side-sheet-close-btn')?.addEventListener('click', () => this.closeSideSheet());
-    document.getElementById('side-sheet-done-btn')?.addEventListener('click', () => this.closeSideSheet());
+    if (selectedSkills.length === 0 || selectedPlatforms.length === 0) {
+      this.showToast("Cannot activate: At least one skill and one AI platform must be selected.");
+      return;
+    }
 
-    // Search input
-    const searchInput = document.getElementById('side-sheet-search-input');
-    searchInput?.addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase();
-      document.querySelectorAll('#side-sheet-skills-list .card').forEach(card => {
-        const text = card.textContent.toLowerCase();
-        card.style.display = text.includes(q) ? '' : 'none';
-      });
-    });
-
-    // Add button handler
-    document.querySelectorAll('.action-add-to-rec').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const id = btn.getAttribute('data-id');
-        btn.textContent = "Added";
-        btn.classList.replace('btn-secondary', 'btn-primary');
-        this.showToast(`Skill '${id}' added to recommendations list.`);
-      });
-    });
-  }
-
-  closeSideSheet() {
-    document.getElementById('active-side-sheet-wrapper')?.remove();
-  }
-
-  // =========================================================================
-  // WORKFLOW ITEM 6 & 7: ACTIVATION CONFIRMATION & RESULT STATES
-  // =========================================================================
-
-  showActivationConfirmationModal() {
     const html = WorkflowDialog.renderActivationConfirmation({
-      project: this.data.sampleProject,
-      workingMode: this.data.state.currentWorkingMode,
-      target: this.data.state.currentTarget,
-      selectedSkills: this.data.state.selectedSkillsForActivation,
-      selectedPlatforms: this.data.state.selectedPlatforms
+      project: proj,
+      workingMode: mode,
+      target: target,
+      selectedSkills,
+      selectedPlatforms
     });
-
     this.renderModal(html);
 
     document.getElementById('btn-confirm-activation')?.addEventListener('click', async () => {
       this.closeModal();
-      // Simulate mock activation result (Item 7)
-      const res = await this.data.simulateActivation(
-        this.data.state.selectedSkillsForActivation,
-        this.data.state.selectedPlatforms,
-        "success"
-      );
 
-      const resultHtml = WorkflowDialog.renderActivationResult(res);
-      this.renderModal(resultHtml);
+      let result = null;
+      if (this.data.isLiveMode && this.data.activateSkills) {
+        result = await this.data.activateSkills(proj.projectId, selectedSkills, selectedPlatformIds);
+      } else {
+        result = {
+          success: true,
+          overallStatus: "success",
+          activatedSkills: selectedSkills,
+          platformResults: selectedPlatforms.map(p => ({ platform: p, status: "Success" }))
+        };
+      }
+
+      this.data.state.selectedSkillIds = [];
+      const resHtml = WorkflowDialog.renderActivationResult({
+        status: result.overallStatus || (result.success ? "success" : "failure"),
+        activatedSkills: result.activatedSkills || selectedSkills,
+        deployments: result.platformResults || selectedPlatforms.map(p => ({ platform: p, status: "Success" }))
+      });
+      this.renderModal(resHtml);
 
       document.getElementById('btn-result-done')?.addEventListener('click', () => {
         this.closeModal();
+        this.navigate('dashboard');
+      });
+      document.getElementById('btn-result-view-active')?.addEventListener('click', () => {
+        this.closeModal();
         this.navigate('active-skills');
       });
-    });
-  }
-
-  // =========================================================================
-  // WORKFLOW ITEM 11: SKILL UPDATE AVAILABLE POPUP
-  // =========================================================================
-
-  showSkillUpdateModal(skillId) {
-    const html = UpdateProgressModal.renderSkillUpdate({
-      skillName: skillId,
-      currentVersion: "v1.0.0",
-      availableVersion: "v1.1.0"
+      document.getElementById('btn-result-retry')?.addEventListener('click', () => {
+        this.closeModal();
+        this.showActivationConfirmationModal();
+      });
+      document.getElementById('btn-result-retry-failed')?.addEventListener('click', () => {
+        this.closeModal();
+        this.showActivationConfirmationModal();
+      });
+      document.getElementById('modal-cancel-btn')?.addEventListener('click', () => this.closeModal());
+      document.getElementById('modal-close-btn')?.addEventListener('click', () => this.closeModal());
     });
 
-    this.renderModal(html);
-
-    document.getElementById('btn-confirm-skill-update')?.addEventListener('click', () => {
-      const progress = document.getElementById('skill-updating-progress');
-      if (progress) {
-        progress.classList.remove('hidden');
-        setTimeout(() => {
-          this.closeModal();
-          this.showToast(`Skill '${skillId}' successfully updated to v1.1.0.`);
-        }, 800);
-      }
-    });
-  }
-
-  // =========================================================================
-  // WORKFLOW ITEM 12: REGISTERED PROJECT LIFECYCLE EDGE CASES
-  // =========================================================================
-
-  showProjectLifecycleModal(type, projectName, path) {
-    const html = UpdateProgressModal.renderProjectLifecycleDialog({ type, projectName, path });
-    this.renderModal(html);
-
-    document.getElementById('btn-edge-open-existing')?.addEventListener('click', () => {
-      this.closeModal();
-      this.navigate('dashboard');
-    });
-
-    document.getElementById('btn-edge-locate')?.addEventListener('click', () => {
-      this.closeModal();
-      this.navigate('add-project');
-    });
-  }
-
-  // =========================================================================
-  // WORKFLOW ITEM 13: APPLICATION UPDATE SIMULATION WIZARD (13A–13J)
-  // =========================================================================
-
-  startAppUpdateFlow() {
-    let currentStep = "13A";
-    const updateModal = (step, progress = 45) => {
-      currentStep = step;
-      const html = UpdateProgressModal.renderAppUpdateFlow(step, { version: "v1.1.0", progress });
-      this.renderModal(html);
-
-      if (step === "13A") {
-        document.getElementById('btn-update-later')?.addEventListener('click', () => {
-          this.closeModal();
-          this.data.state.updateDismissed = true;
-          this.refreshShell();
-          this.showToast("Update deferred. You can update anytime from Update Center.");
-        });
-
-        document.getElementById('btn-update-download-now')?.addEventListener('click', () => {
-          updateModal("13C", 30);
-          setTimeout(() => updateModal("13C", 75), 400);
-          setTimeout(() => updateModal("13D"), 800);
-          setTimeout(() => updateModal("13E"), 1400);
-        });
-      } else if (step === "13C") {
-        document.getElementById('btn-update-cancel-download')?.addEventListener('click', () => {
-          this.closeModal();
-          this.showToast("Download cancelled.");
-        });
-      } else if (step === "13E") {
-        document.getElementById('btn-update-install-exit')?.addEventListener('click', () => {
-          this.closeModal();
-          this.showToast("Update will be installed when Nexora closes.");
-        });
-
-        document.getElementById('btn-update-restart-now')?.addEventListener('click', () => {
-          updateModal("13G");
-        });
-      } else if (step === "13G") {
-        document.getElementById('btn-update-finish')?.addEventListener('click', () => {
-          this.closeModal();
-          this.showToast("Running Nexora v1.1.0 update simulation.");
-        });
-      }
-    };
-
-    updateModal("13A");
-  }
-
-  // =========================================================================
-  // GENERAL MODAL & TOAST MANAGERS
-  // =========================================================================
-
-  showDeactivateModal(skillId, projectName) {
-    const modalHtml = ConfirmationDialog.render({
-      title: "Deactivate Skill",
-      message: `Are you sure you want to deactivate this skill from ${projectName}? It will be safely removed from the project's active context without affecting other projects.`,
-      skillId: skillId,
-      projectName: projectName,
-      confirmText: "Deactivate",
-      isDestructive: true,
-      onConfirmAction: "confirm-deactivate"
-    });
-
-    this.renderModal(modalHtml, () => {
-      this.showToast(`Skill '${skillId}' deactivated from ${projectName}.`);
-    });
-  }
-
-  showRemoveAllModal(skillId, affectedProjects) {
-    const modalHtml = ConfirmationDialog.render({
-      title: "Remove Skill From All Projects",
-      message: `This will deactivate '${skillId}' from all associated projects in your registry. This action cannot be undone automatically.`,
-      skillId: skillId,
-      projectCount: affectedProjects.length,
-      projectList: affectedProjects,
-      confirmText: "Remove From All Projects",
-      isDestructive: true,
-      onConfirmAction: "confirm-remove-all"
-    });
-
-    this.renderModal(modalHtml, () => {
-      this.showToast(`Skill '${skillId}' removed from all ${affectedProjects.length} projects.`);
-      this.navigate('skill-library');
-    });
-  }
-
-  renderModal(html, onConfirm) {
-    this.closeModal();
-    const div = document.createElement('div');
-    div.id = 'active-modal-wrapper';
-    div.innerHTML = html;
-    document.body.appendChild(div);
-
-    document.getElementById('modal-close-btn')?.addEventListener('click', () => this.closeModal());
     document.getElementById('modal-cancel-btn')?.addEventListener('click', () => this.closeModal());
-    document.getElementById('modal-confirm-btn')?.addEventListener('click', () => {
-      this.closeModal();
-      if (onConfirm) onConfirm();
-    });
+    document.getElementById('modal-close-btn')?.addEventListener('click', () => this.closeModal());
   }
 
-  closeModal() {
-    document.getElementById('active-modal-wrapper')?.remove();
+  async showDeactivateModal(skillId, projectName = "Current Project") {
+    const projId = (this.viewParams && this.viewParams.activeProject && this.viewParams.activeProject.projectId) || null;
+    const selectedPlatformIds = (this.data.state && this.data.state.selectedPlatformIds) || ["antigravity", "cursor"];
+    const confirmTitle = `Deactivate Skill: ${skillId}`;
+    const confirmMsg = `Are you sure you want to deactivate '${skillId}' from '${projectName}'? This will undeploy the skill files from configured AI platform workspaces.`;
+
+    if (confirm(`${confirmTitle}\n\n${confirmMsg}`)) {
+      let res = null;
+      if (this.data.isLiveMode && this.data.deactivateSkill) {
+        res = await this.data.deactivateSkill(projId, skillId, selectedPlatformIds);
+      } else {
+        res = { success: true, message: `Skill ${skillId} deactivated` };
+      }
+
+      if (res && res.success) {
+        this.showToast(`Skill '${skillId}' deactivated and undeployed successfully.`);
+        if (this.currentView === 'active-skills' || this.currentView === 'dashboard') {
+          this.navigate(this.currentView);
+        } else {
+          this.navigate('active-skills');
+        }
+      } else {
+        this.showToast(`Failed to deactivate '${skillId}': ${(res && res.error && res.error.message) || 'Unknown error'}`);
+      }
+    }
+  }
+
+  // =========================================================================
+  // GATE 7: PROTECTED GLOBAL REMOVAL WORKFLOW
+  // =========================================================================
+
+  async startGlobalRemovalFlow(skillId) {
+    if (!skillId) return;
+
+    let preview = null;
+    if (this.data.isLiveMode && this.data.previewGlobalRemoval) {
+      preview = await this.data.previewGlobalRemoval(skillId);
+      if (!preview.success) {
+        this.showToast(`Failed to generate global removal preview: ${(preview.error && preview.error.message) || 'Unknown error'}`);
+        return;
+      }
+    } else {
+      preview = {
+        success: true,
+        operationId: "op_mock_" + Date.now(),
+        skillId,
+        affectedProjectCount: (this.data.allProjects || []).length,
+        affectedProjects: this.data.allProjects || []
+      };
+    }
+
+    const html = WorkflowDialog.renderGlobalRemovalConfirmation({
+      skillId: preview.skillId || skillId,
+      affectedProjectCount: preview.affectedProjectCount,
+      affectedProjects: preview.affectedProjects
+    });
+    this.renderModal(html);
+
+    document.getElementById('btn-confirm-remove-all')?.addEventListener('click', async () => {
+      this.closeModal();
+
+      let result = null;
+      if (this.data.isLiveMode && this.data.executeGlobalRemoval) {
+        result = await this.data.executeGlobalRemoval(preview.operationId);
+      } else {
+        result = {
+          success: true,
+          overallStatus: "success",
+          totalAffected: preview.affectedProjectCount,
+          succeededCount: preview.affectedProjectCount,
+          failedCount: 0,
+          projectResults: (preview.affectedProjects || []).map(p => ({ name: p.name, success: true }))
+        };
+      }
+
+      const resHtml = WorkflowDialog.renderGlobalRemovalResult({
+        status: result.overallStatus || (result.success ? "success" : "failure"),
+        skillId: preview.skillId || skillId,
+        totalAffected: result.totalAffected || preview.affectedProjectCount,
+        succeededCount: result.succeededCount || 0,
+        failedCount: result.failedCount || 0,
+        projectResults: result.projectResults || []
+      });
+      this.renderModal(resHtml);
+
+      document.getElementById('btn-global-result-done')?.addEventListener('click', () => {
+        this.closeModal();
+        if (this.currentView === 'cross-project') {
+          this.navigate('cross-project', { skillId });
+        } else if (this.currentView === 'skill-detail') {
+          this.navigate('skill-detail', { skillId });
+        } else {
+          this.navigate('dashboard');
+        }
+      });
+      document.getElementById('modal-close-btn')?.addEventListener('click', () => this.closeModal());
+    });
+
+    document.getElementById('modal-cancel-btn')?.addEventListener('click', () => this.closeModal());
+    document.getElementById('modal-close-btn')?.addEventListener('click', () => this.closeModal());
+  }
+
+  // =========================================================================
+  // GATE 8: SYSTEM HEALTH REFRESH & REPAIR WORKFLOW
+  // =========================================================================
+
+  async refreshHealthStatus() {
+    if (this._isRefreshingHealth) return;
+    this._isRefreshingHealth = true;
+    try {
+      const health = this.data.getHealthChecks ? await this.data.getHealthChecks() : null;
+      this.showToast("System health status refreshed.");
+      this.navigate('system-health', { health });
+    } finally {
+      this._isRefreshingHealth = false;
+    }
+  }
+
+  async startHealthRepairFlow(categoryId = null, categoryName = "All Diagnostic Warnings") {
+    const html = WorkflowDialog.renderHealthRepairConfirmation({ categoryId, categoryName });
+    this.renderModal(html);
+
+    document.getElementById('btn-confirm-health-repair')?.addEventListener('click', async (e) => {
+      this.closeModal();
+      const id = e.currentTarget.getAttribute('data-id') || null;
+      let res = null;
+      if (this.data.repairHealth) {
+        res = await this.data.repairHealth(id);
+      } else {
+        res = { success: true, repairsApplied: ["Environment shims verified", "Metadata verified"] };
+      }
+
+      const resHtml = WorkflowDialog.renderHealthRepairResult(res);
+      this.renderModal(resHtml);
+
+      document.getElementById('btn-health-repair-done')?.addEventListener('click', () => {
+        this.closeModal();
+        this.navigate('system-health', { health: res.health });
+      });
+      document.getElementById('modal-close-btn')?.addEventListener('click', () => this.closeModal());
+    });
+
+    document.getElementById('modal-cancel-btn')?.addEventListener('click', () => this.closeModal());
+    document.getElementById('modal-close-btn')?.addEventListener('click', () => this.closeModal());
+  }
+
+  // =========================================================================
+  // GATE 9: ACTIVITY TIMELINE & LOCAL UPDATE REFRESH
+  // =========================================================================
+
+  async refreshActivityTimeline(projectId = null) {
+    if (this._isRefreshingActivity) return;
+    this._isRefreshingActivity = true;
+    try {
+      const logs = this.data.getActivityLogs ? await this.data.getActivityLogs(projectId) : [];
+      this.showToast("Activity history refreshed.");
+      this.navigate('recent-activity', { activityLogs: logs });
+    } finally {
+      this._isRefreshingActivity = false;
+    }
+  }
+
+  async refreshLocalUpdateStatus() {
+    if (this._isRefreshingUpdates) return;
+    this._isRefreshingUpdates = true;
+    try {
+      const status = this.data.getUpdateStatus ? await this.data.getUpdateStatus() : null;
+      const modules = this.data.getUpdateModules ? await this.data.getUpdateModules() : [];
+      this.showToast("Local update status refreshed.");
+      this.navigate('update-center', { updateStatus: status, updateModules: modules });
+    } finally {
+      this._isRefreshingUpdates = false;
+    }
   }
 
   showToast(message) {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'toast-container';
+      container.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px;';
+      document.body.appendChild(container);
+    }
+
     const toast = document.createElement('div');
     toast.className = 'card';
-    toast.style.cssText = `
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 200;
-      padding: var(--space-3) var(--space-4);
-      background-color: var(--color-surface-high);
-      border-color: var(--color-primary);
-      box-shadow: var(--shadow-level-2);
-      font-size: var(--text-body-sm);
-      color: var(--color-on-surface);
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      animation: fadeIn 0.2s ease;
-    `;
-    toast.innerHTML = `
-      <span class="material-symbols-outlined" style="color: var(--color-primary); font-size: 16px;">info</span>
-      <span>${message}</span>
-    `;
-    document.body.appendChild(toast);
+    toast.style.cssText = 'padding: 12px 16px; background-color: var(--color-surface-container-high); border-color: var(--color-primary); color: var(--color-on-surface); font-size: 13px; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.3);';
+    toast.innerHTML = `<div class="flex items-center gap-2"><span class="material-symbols-outlined" style="color: var(--color-primary); font-size: 18px;">info</span><span>${message}</span></div>`;
 
+    container.appendChild(toast);
     setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transition = 'opacity 0.3s ease';
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
+      toast.remove();
+    }, 3500);
+  }
+
+  renderModal(htmlContent) {
+    let overlay = document.getElementById('modal-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'modal-overlay';
+      overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); z-index: 9000; display: flex; align-items: center; justify-content: center;';
+      document.body.appendChild(overlay);
+    }
+    overlay.innerHTML = htmlContent;
+  }
+
+  closeModal() {
+    const overlay = document.getElementById('modal-overlay');
+    if (overlay) overlay.remove();
   }
 }
 
-// Instantiate and attach to window
-window.NexoraApp = new NexoraApp();
-document.addEventListener('DOMContentLoaded', () => {
-  window.NexoraApp.init();
-});
+// Global App Initialization
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    window.nexoraApp = new NexoraApp();
+    window.nexoraApp.init();
+  });
+}
+
+export { NexoraApp };

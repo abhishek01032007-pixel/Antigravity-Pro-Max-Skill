@@ -1,6 +1,10 @@
 /**
  * ui-screen-validation.js - Automated Test Suite for Phase 6.1A UI Screens
  */
+if (typeof global !== 'undefined') {
+  global.window = global.window || {};
+  global.window.__NEXORA_MOCK_MODE__ = true;
+}
 import { BridgeService } from '../js/bridge/BridgeService.js';
 import { NexoraAppShell } from '../js/components/NexoraAppShell.js';
 import { ConfirmationDialog } from '../js/components/ConfirmationDialog.js';

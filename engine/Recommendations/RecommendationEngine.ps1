@@ -5,7 +5,11 @@ function Get-NexoraSkillRecommendations {
         [Parameter(Mandatory=$true)]
         [psobject]$Analysis,
         [Parameter(Mandatory=$true)]
-        [array]$AvailableSkills
+        [array]$AvailableSkills,
+        [Parameter(Mandatory=$false)]
+        [string]$WorkingMode = $null,
+        [Parameter(Mandatory=$false)]
+        [string]$Target = $null
     )
 
     $recommended = [System.Collections.Generic.List[psobject]]::new()
@@ -50,9 +54,14 @@ function Get-NexoraSkillRecommendations {
     $hasDatabase = $dbStack.Count -gt 0 -or $techs -contains "supabase" -or $techs -contains "firebase"
     $hasQA = $qaStack.Count -gt 0
 
+    # Contextual Working Mode & Target (GAP 1)
+    $normMode = if ($WorkingMode) { $WorkingMode.ToLower().Trim() } else { $null }
+    $normTarget = if ($Target) { $Target.ToLower().Trim() } else { $null }
+
     foreach ($skill in $AvailableSkills) {
         $skillId = $skill.Id.ToLower()
         $pack = $skill.Pack.ToLower()
+        $category = if ($skill.PSObject.Properties["Category"]) { $skill.Category } else { "" }
         $score = 0
         $reasons = [System.Collections.Generic.List[string]]::new()
 
@@ -135,6 +144,72 @@ function Get-NexoraSkillRecommendations {
         if ($isMobile -and $skillId -eq "mobile-developer") {
             $score += 15
             $reasons.Add("Mobile application detected")
+        }
+
+        # =====================
+        # 9. Contextual Working Mode Boost (GAP 1)
+        # =====================
+        if ($normMode) {
+            if ($normMode -eq "frontend" -or $normMode -like "*frontend*") {
+                if ($category -eq "Frontend" -or $pack -like "*frontend*" -or $skillId -in @("frontend_design", "enhance_ui", "flutter-build-responsive-layout", "flutter-add-widget-preview", "ui_ux_pro_max", "web_performance_optimization")) {
+                    $score += 20
+                    $reasons.Add("Matched user working mode: Frontend Development")
+                }
+            }
+            elseif ($normMode -eq "backend" -or $normMode -like "*backend*") {
+                if ($category -eq "Backend" -or $pack -like "*backend*" -or $skillId -in @("api-design-principles", "backend-architect", "backend-security-coder", "architecture-patterns", "document_api", "error-handling-patterns")) {
+                    $score += 20
+                    $reasons.Add("Matched user working mode: Backend Development")
+                }
+            }
+            elseif ($normMode -eq "fullstack" -or $normMode -like "*full*") {
+                if ($category -in @("Frontend", "Backend", "Full Stack") -or $skillId -like "*full-stack*" -or $skillId -in @("architecture-patterns", "frontend_design", "backend-architect")) {
+                    $score += 15
+                    $reasons.Add("Matched user working mode: Full Stack Development")
+                }
+            }
+            elseif ($normMode -eq "qa" -or $normMode -like "*qa*" -or $normMode -like "*debug*") {
+                if ($category -in @("QA", "Debugging", "Code Quality", "Security") -or $skillId -like "*test*" -or $skillId -in @("debug_issue", "debugger", "test_runner", "scaffold_tests", "code_review", "security_audit", "e2e-testing-patterns")) {
+                    $score += 20
+                    $reasons.Add("Matched user working mode: QA / Debugging")
+                }
+            }
+        }
+
+        # =====================
+        # 10. Contextual Target Boost (GAP 1)
+        # =====================
+        if ($normTarget) {
+            if ($normTarget -in @("mobile_application", "mobile application", "mobile")) {
+                if ($skillId -like "*flutter*" -or $skillId -like "*dart*" -or $skillId -eq "mobile-developer" -or $skillId -eq "android-cli") {
+                    $score += 10
+                    $reasons.Add("Targeted for Mobile Application")
+                }
+            }
+            elseif ($normTarget -in @("web_application", "web application", "website", "web")) {
+                if ($skillId -like "*web*" -or $skillId -like "*frontend*" -or $skillId -like "*react*") {
+                    $score += 10
+                    $reasons.Add("Targeted for Web Application")
+                }
+            }
+            elseif ($normTarget -in @("api_service", "api / service", "web_backend", "web / app backend", "backend / api", "backend")) {
+                if ($skillId -in @("api-design-principles", "document_api", "backend-architect", "backend-security-coder")) {
+                    $score += 10
+                    $reasons.Add("Targeted for API / Backend Service")
+                }
+            }
+            elseif ($normTarget -in @("database_layer", "database / data layer", "database")) {
+                if ($skillId -in @("architecture-patterns", "backend-architect", "security_audit")) {
+                    $score += 10
+                    $reasons.Add("Targeted for Database / Data Layer")
+                }
+            }
+            elseif ($normTarget -in @("full_project", "full project")) {
+                if ($skillId -in @("architect-review", "code_review", "debug_issue", "security_audit")) {
+                    $score += 10
+                    $reasons.Add("Targeted for Full Project QA")
+                }
+            }
         }
 
         if ($score -ge 30) {

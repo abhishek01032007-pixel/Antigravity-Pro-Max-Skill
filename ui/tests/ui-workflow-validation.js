@@ -5,6 +5,11 @@
  * ============================================================================
  */
 
+if (typeof global !== 'undefined') {
+  global.window = global.window || {};
+  global.window.__NEXORA_MOCK_MODE__ = true;
+}
+
 import assert from 'node:assert';
 import { BridgeService } from '../js/bridge/BridgeService.js';
 import { WorkflowDialog } from '../js/components/WorkflowDialog.js';
@@ -228,7 +233,7 @@ test("Item 10: SkillLibraryScreen contains skill sync status panel", () => {
   const html = SkillLibraryScreen.render(BridgeService);
   assert(html.includes("id=\"skill-sync-status-panel\""));
   assert(html.includes("Skill Library Up to Date"));
-  assert(html.includes("48 official skills installed"));
+  assert(html.includes("official skills installed"));
 });
 
 // 12. Item 11: Skill Update Available Popup

@@ -112,7 +112,7 @@ try {
     Assert-Equal $updateStatus.currentVersion "1.0.0" "Update status contains current version 1.0.0"
 
     $doc = Invoke-NexoraApplicationDoctor
-    Assert-Equal ($doc.checks.Count -eq 5) $true "Doctor returns 5 structured diagnostic checks"
+    Assert-Equal ($doc.checks.Count -eq 6) $true "Doctor returns 6 structured diagnostic checks"
 }
 finally {
     $env:LOCALAPPDATA = $origLocalApp

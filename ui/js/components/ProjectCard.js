@@ -3,11 +3,12 @@
  */
 export const ProjectCard = {
   render(project, isSelected = false) {
-    const icon = project.type === "Mobile Application" ? "integration_instructions" : (project.framework.includes("HTML") ? "memory" : "shopping_cart");
+    const fw = project.framework || (project.frontend && project.frontend[0]) || 'Flutter';
+    const icon = (project.type && project.type.includes("Mobile")) ? "integration_instructions" : (fw.includes("HTML") ? "memory" : "folder");
     const containerClass = isSelected ? "card-selected" : "card-clickable";
 
     return `
-      <div class="flex items-center gap-3 card ${containerClass}" data-project-id="${project.id}" style="padding: var(--space-3) var(--space-4); min-width: 230px; flex-shrink: 0;">
+      <div class="flex items-center gap-3 card ${containerClass}" data-project-id="${project.id || project.projectId}" style="padding: var(--space-3) var(--space-4); min-width: 230px; flex-shrink: 0;">
         <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background-color: ${isSelected ? 'var(--color-primary-container)' : 'var(--color-surface-high)'}; color: ${isSelected ? 'var(--color-on-primary-container)' : 'var(--color-on-surface-variant)'}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
           <span class="material-symbols-outlined" style="font-size: 16px;">${icon}</span>
         </div>
@@ -16,7 +17,7 @@ export const ProjectCard = {
             ${project.name}
           </span>
           <span style="font-size: var(--text-meta); color: var(--color-on-surface-variant);">
-            ${project.type} | ${project.framework || 'Flutter'}
+            ${project.type || 'Project'} | ${fw}
           </span>
         </div>
       </div>
