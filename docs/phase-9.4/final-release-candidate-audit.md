@@ -17,7 +17,7 @@ Phase 9.4 delivers the final Release Candidate (RC) readiness audit for Nexora S
 | **Platform Contract** | `win32` / `x64` | Emitted by generator & validated by `UpdateManifestClient` | **VERIFIED** |
 | **User Platform Display** | `Windows x64` | Rendered across Settings, About, and README | **VERIFIED** |
 | **Public Bridge Ops** | Exactly `29` | Frozen in registry and verified by automated tests | **VERIFIED** |
-| **Built-in Skills** | `48+` | Verified catalog baseline | **VERIFIED** |
+| **Built-in Skills** | `48` | Verified catalog baseline | **VERIFIED** |
 
 ---
 
