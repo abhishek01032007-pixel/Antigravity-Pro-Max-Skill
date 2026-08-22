@@ -1,0 +1,122 @@
+/* ==========================================================================
+   NEXORA SKILLS MANAGER - DESIGN SYSTEM TOKENS (THEME.CSS)
+   Source of Truth: Google Stitch Frozen Designs
+   ========================================================================== */
+
+:root {
+  /* Color Mode: Dark Charcoal Foundation */
+  --color-bg: #13131b;
+  --color-surface: #13131b;
+  --color-surface-dim: #13131b;
+  --color-surface-bright: #393841;
+  --color-surface-lowest: #0d0d15;
+  --color-surface-low: #1b1b23;
+  --color-surface-container: #1f1f27;
+  --color-surface-high: #292932;
+  --color-surface-highest: #34343d;
+  --color-surface-variant: #34343d;
+
+  /* Typography Colors */
+  --color-on-surface: #e4e1ed;
+  --color-on-surface-variant: #c7c4d7;
+  --color-on-background: #e4e1ed;
+  --color-outline: #908fa0;
+  --color-outline-variant: #464554;
+  --color-secondary: #c6c6cb;
+  --color-on-secondary: #2f3034;
+  --color-secondary-container: #46464b;
+  --color-on-secondary-container: #b5b4ba;
+
+  /* Primary Accent Colors (Blue-Violet) */
+  --color-primary: #c0c1ff;
+  --color-primary-accent: #6366f1;
+  --color-primary-container: #8083ff;
+  --color-on-primary-container: #0d0096;
+  --color-primary-fixed: #e1e0ff;
+  --color-on-primary-fixed: #07006c;
+  --color-on-primary-fixed-variant: #2f2ebe;
+
+  /* Semantic Status Colors */
+  --color-success: #22c55e;
+  --color-success-bg: rgba(34, 197, 94, 0.1);
+  --color-success-border: rgba(34, 197, 94, 0.25);
+  
+  --color-warning: #f59e0b;
+  --color-warning-tertiary: #ffb783;
+  --color-warning-container: #d97721;
+  --color-warning-bg: rgba(245, 158, 11, 0.1);
+  --color-warning-border: rgba(245, 158, 11, 0.25);
+  
+  --color-error: #ffb4ab;
+  --color-error-accent: #ef4444;
+  --color-error-container: #93000a;
+  --color-on-error-container: #ffdad6;
+  --color-error-bg: rgba(239, 68, 68, 0.1);
+  --color-error-border: rgba(239, 68, 68, 0.25);
+
+  /* Typography Scale */
+  --font-family-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-label: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-code: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Font Sizes and Line Heights */
+  --text-app-title: 12px;
+  --leading-app-title: 16px;
+  --weight-app-title: 600;
+
+  --text-screen-title: 18px;
+  --leading-screen-title: 24px;
+  --weight-screen-title: 600;
+
+  --text-section-header: 14px;
+  --leading-section-header: 20px;
+  --weight-section-header: 600;
+
+  --text-body-md: 13px;
+  --leading-body-md: 18px;
+  --weight-body-md: 400;
+
+  --text-body-sm: 12px;
+  --leading-body-sm: 16px;
+  --weight-body-sm: 400;
+
+  --text-label-caps: 11px;
+  --leading-label-caps: 12px;
+  --weight-label-caps: 600;
+  --tracking-label-caps: 0.05em;
+
+  --text-code: 12px;
+  --leading-code: 18px;
+  --weight-code: 400;
+
+  --text-meta: 11px;
+  --leading-meta: 14px;
+  --weight-meta: 400;
+
+  /* Spacing Scale (4px Base Grid) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --gutter: 12px;
+  --panel-margin: 16px;
+
+  /* Layout Constants */
+  --sidebar-width: 240px;
+  --topbar-height: 32px;
+
+  /* Corner Radius */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-full: 9999px;
+
+  /* Shadows & Depth */
+  --shadow-level-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-level-2: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-modal: 0 12px 32px rgba(0, 0, 0, 0.7);
+  --shadow-active-inset: inset 2px 0 0 #c0c1ff;
+}
