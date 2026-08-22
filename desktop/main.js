@@ -90,7 +90,14 @@ async function createWindow() {
     }
   });
 
-  mainWindow.webContents.setWindowOpenHandler(() => {
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol === 'https:' && parsed.hostname === 'github.com' && parsed.pathname.startsWith('/abhishek01032007-pixel/Nexora-Skills-Manager/releases')) {
+        const { shell } = require('electron');
+        shell.openExternal(url);
+      }
+    } catch {}
     return { action: 'deny' };
   });
 

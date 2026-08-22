@@ -51,7 +51,11 @@ const FROZEN_25_OPERATIONS = new Set([
   'doctor.run',
   'doctor.repair',
   'activity.list',
-  'updates.status'
+  'updates.status',
+  'updates.check',
+  'updates.download',
+  'updates.cancelDownload',
+  'updates.install'
 ]);
 
 async function runTests() {
@@ -61,15 +65,15 @@ async function runTests() {
 
   try {
     // =========================================================================
-    // SECTION 1: EXACT 25-OPERATION REGISTRY CONTRACT TEST
+    // SECTION 1: EXACT 29-OPERATION REGISTRY CONTRACT TEST
     // =========================================================================
 
     const currentSet = new Set(OPERATION_IDS);
-    const hasExact25 = currentSet.size === 25 &&
-      FROZEN_25_OPERATIONS.size === 25 &&
+    const hasExact29 = currentSet.size === 29 &&
+      FROZEN_25_OPERATIONS.size === 29 &&
       [...FROZEN_25_OPERATIONS].every(op => currentSet.has(op));
 
-    assertTest(hasExact25, 'Exact 25-operation frozen contract set equality');
+    assertTest(hasExact29, 'Exact 29-operation registry contract set equality');
 
     // =========================================================================
     // SECTION 2: PROTOCOL & WORKER LIFECYCLE TESTS

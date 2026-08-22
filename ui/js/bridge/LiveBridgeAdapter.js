@@ -139,13 +139,7 @@ export const LiveBridgeAdapter = {
   async getUpdateStatus() {
     const res = await this._invokeBridge('updates.status');
     if (res.success && res.data) {
-      return {
-        currentVersion: res.data.currentVersion || '1.0.0',
-        latestVersion: null,
-        updateAvailable: null,
-        checkedRemotely: false,
-        channel: res.data.channel || 'stable'
-      };
+      return res.data;
     }
     return {
       currentVersion: '1.0.0',
@@ -154,6 +148,44 @@ export const LiveBridgeAdapter = {
       checkedRemotely: false,
       channel: 'stable'
     };
+  },
+
+  /**
+   * Live updates.check
+   */
+  async checkForUpdates() {
+    return await this._invokeBridge('updates.check');
+  },
+
+  /**
+   * Live updates.download
+   */
+  async downloadUpdate() {
+    return await this._invokeBridge('updates.download');
+  },
+
+  /**
+   * Live updates.cancelDownload
+   */
+  async cancelUpdateDownload() {
+    return await this._invokeBridge('updates.cancelDownload');
+  },
+
+  /**
+   * Live updates.install
+   */
+  async installUpdate() {
+    return await this._invokeBridge('updates.install');
+  },
+
+  /**
+   * Subscribes to update download progress events
+   */
+  onUpdateProgress(callback) {
+    if (window.nexoraBridge && typeof window.nexoraBridge.onUpdateProgress === 'function') {
+      return window.nexoraBridge.onUpdateProgress(callback);
+    }
+    return () => {};
   },
 
   // =========================================================================
@@ -988,6 +1020,31 @@ export const LiveBridgeAdapter = {
       status: 'Update status unavailable',
       message: 'Could not resolve local update metadata',
       error: res.error || { code: 'UPDATE_STATUS_FAILED', message: 'Update status unavailable' }
+    };
+  },
+
+  /**
+   * Live updates.check
+   */
+  async checkForUpdates(options = {}) {
+    const res = await this._invokeBridge('updates.check', options);
+    if (res.success && res.data) {
+      return {
+        success: true,
+        ...this.normalizeUpdateStatus(res.data)
+      };
+    }
+
+    return {
+      success: false,
+      currentVersion: (res.data && res.data.currentVersion) || 'v1.0.0',
+      latestVersion: null,
+      updateAvailable: null,
+      checkedRemotely: false,
+      channel: 'stable',
+      status: (res.error && res.error.code === 'UPDATE_OFFLINE') ? 'Offline' : 'Update check failed',
+      message: (res.error && res.error.message) || 'Remote update check failed',
+      error: res.error || { code: 'UPDATE_REMOTE_ERROR', message: 'Remote update check failed' }
     };
   },
 

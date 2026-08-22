@@ -340,6 +340,19 @@ export const MockBridgeAdapter = {
     });
   },
 
+  async checkForUpdates() {
+    return Promise.resolve({
+      success: true,
+      currentVersion: "v1.0.0",
+      latestVersion: "v1.0.0",
+      updateAvailable: false,
+      checkedRemotely: true,
+      channel: "stable",
+      status: "Nexora is up to date",
+      message: "You are running the latest version of Nexora Skills Manager (v1.0.0)."
+    });
+  },
+
   getStatusPillText() {
     if (this.state.isOffline) return '● Offline (Local Mode)';
     return '● Healthy | Up to date';
@@ -427,6 +440,41 @@ export const MockBridgeAdapter = {
       status: "Up to date",
       message: "All components and skill packages are on the verified stable release."
     });
+  },
+  async checkForUpdates() {
+    return Promise.resolve({
+      success: true,
+      currentVersion: "1.0.0",
+      latestVersion: "1.0.1",
+      updateAvailable: true,
+      checkedRemotely: true
+    });
+  },
+  async downloadUpdate() {
+    return Promise.resolve({
+      success: true,
+      operationId: 'upd_mock_download',
+      version: '1.0.1',
+      state: 'ready_to_install'
+    });
+  },
+  async cancelUpdateDownload() {
+    return Promise.resolve({
+      success: true,
+      status: 'cancelled'
+    });
+  },
+  async installUpdate() {
+    return Promise.resolve({
+      success: true,
+      operationId: 'upd_mock_download',
+      status: 'helper_spawned',
+      state: 'installing',
+      message: 'Update helper launched successfully. Application is restarting...'
+    });
+  },
+  onUpdateProgress(callback) {
+    return () => {};
   },
   async getUpdateModules() { return Promise.resolve(this.updateModules); }
 };

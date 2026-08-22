@@ -53,13 +53,17 @@ async function runTests() {
     "doctor.run",
     "doctor.repair",
     "activity.list",
-    "updates.status"
+    "updates.status",
+    "updates.check",
+    "updates.download",
+    "updates.cancelDownload",
+    "updates.install"
   ];
 
-  // Case A: Exact 25 operations
+  // Case A: Exact 29 operations
   const registryOps = host.getAllowedOperations ? host.getAllowedOperations() : FROZEN_OPERATIONS;
-  const isExact25 = registryOps.length === 25 && FROZEN_OPERATIONS.every(op => registryOps.includes(op));
-  assertTest(isExact25, "Case A: exact 25-operation frozen registry equality");
+  const isExact29 = registryOps.length === 29 && FROZEN_OPERATIONS.every(op => registryOps.includes(op));
+  assertTest(isExact29, "Case A: exact 29-operation registry equality");
 
   // Case B: Production live adapter selection in real runtime
   assertTest(typeof LiveBridgeAdapter === 'object' && typeof LiveBridgeAdapter.getProjectsList === 'function', "Case B: production live adapter selected");

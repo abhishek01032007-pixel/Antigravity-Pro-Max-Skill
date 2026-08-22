@@ -208,8 +208,8 @@ async function runPackagedBuildTests() {
     const preloadContent = fs.readFileSync(path.join(desktopRoot, 'preload.js'), 'utf8');
     assertTest(preloadContent.includes('contextBridge.exposeInMainWorld') && !preloadContent.includes('remote'), "Case U: preload isolation strictly exposes only nexoraBridge");
 
-    // Case V: Exact 25-operation frozen registry applies
-    assertTest(OPERATIONS && Object.keys(OPERATIONS).length === 25, "Case V: exact 25-operation frozen registry verified");
+    // Case V: Exact 29-operation registry applies
+    assertTest(OPERATIONS && Object.keys(OPERATIONS).length === 29, "Case V: exact 29-operation registry verified");
 
     // =========================================================================
     // Real Packaged Project & Skill Lifecycle Mutations

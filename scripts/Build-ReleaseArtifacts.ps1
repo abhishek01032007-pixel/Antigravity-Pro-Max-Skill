@@ -102,6 +102,14 @@ try {
     Copy-Item (Join-Path $RepoRoot "Start-Nexora-Skills-Manager.bat") (Join-Path $runtimeStaging "Start-Nexora-Skills-Manager.bat") -Force
     Copy-Item (Join-Path $RepoRoot "Start-Antigravity-Pro-Max.bat") (Join-Path $runtimeStaging "Start-Antigravity-Pro-Max.bat") -Force
 
+    # 3e. Copy Update Helper
+    $updateDst = Join-Path $runtimeStaging "update"
+    New-Item -ItemType Directory -Path $updateDst -Force | Out-Null
+    $helperSrc = Join-Path $RepoRoot "engine\Update\NexoraUpdateHelper.ps1"
+    if (Test-Path $helperSrc) {
+        Copy-Item $helperSrc (Join-Path $updateDst "NexoraUpdateHelper.ps1") -Force
+    }
+
     # Compress runtime staging
     if (Test-Path $runtimeZipTarget) { Remove-Item $runtimeZipTarget -Force }
     Compress-Archive -Path "$stagingRoot\*" -DestinationPath $runtimeZipTarget -Force
@@ -127,18 +135,28 @@ Set-Content -Path (Join-Path $OutputDir "SHA256SUMS.txt") -Value $checksumConten
 # 5. Generate release-manifest.json
 Write-Host "[4/4] Generating release-manifest.json..." -ForegroundColor Yellow
 $manifest = [PSCustomObject]@{
-    version   = $version
-    channel   = "stable"
-    createdAt = (Get-Date).ToString("o")
-    desktop   = [PSCustomObject]@{
-        file   = $desktopZipName
-        sha256 = $desktopHash
-        size   = (Get-Item $desktopZipTarget).Length
+    schemaVersion           = 1
+    product                 = "Nexora Skills Manager"
+    version                 = $version
+    channel                 = "stable"
+    minimumSupportedVersion = "1.0.0"
+    publishedAt             = (Get-Date).ToString("o")
+    releaseNotesUrl         = "https://github.com/abhishek01032007-pixel/Nexora-Skills-Manager/releases/tag/v$version"
+    desktop                 = [PSCustomObject]@{
+        platform = "windows"
+        arch     = "x64"
+        file     = $desktopZipName
+        url      = "https://github.com/abhishek01032007-pixel/Nexora-Skills-Manager/releases/download/v$version/$desktopZipName"
+        sha256   = $desktopHash
+        size     = (Get-Item $desktopZipTarget).Length
     }
-    runtime   = [PSCustomObject]@{
-        file   = $runtimeZipName
-        sha256 = $runtimeHash
-        size   = (Get-Item $runtimeZipTarget).Length
+    runtime                 = [PSCustomObject]@{
+        platform = "windows"
+        arch     = "x64"
+        file     = $runtimeZipName
+        url      = "https://github.com/abhishek01032007-pixel/Nexora-Skills-Manager/releases/download/v$version/$runtimeZipName"
+        sha256   = $runtimeHash
+        size     = (Get-Item $runtimeZipTarget).Length
     }
 }
 

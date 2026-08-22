@@ -154,6 +154,11 @@ while ($null -ne ($line = [Console]::In.ReadLine())) {
                 $res = Get-NexoraApplicationUpdateStatus
                 Send-BridgeResponse -RequestId $reqId -Success $true -Data $res
             }
+            "updates.check" {
+                $channel = if ($payload.PSObject.Properties["channel"]) { $payload.channel } else { "stable" }
+                $res = Invoke-NexoraApplicationUpdateCheck -Channel $channel
+                Send-BridgeResponse -RequestId $reqId -Success $true -Data $res
+            }
 
             # --- Project Registry & Context ---
             "projects.list" {
@@ -402,6 +407,35 @@ while ($null -ne ($line = [Console]::In.ReadLine())) {
                     $limit = [int]$limitRaw
                     $res = Get-NexoraApplicationActivityLogs -ProjectId $projectId -Limit $limit
                     Send-BridgeResponse -RequestId $reqId -Success $true -Data $res
+                }
+            }
+            "updates.status" {
+                $res = Get-NexoraApplicationUpdateStatus
+                Send-BridgeResponse -RequestId $reqId -Success $true -Data $res
+            }
+            "updates.check" {
+                $res = Invoke-NexoraApplicationUpdateCheck
+                Send-BridgeResponse -RequestId $reqId -Success $res.success -Data $res -ErrorObj $(if (-not $res.success) { $res.error } else { $null })
+            }
+            "updates.download" {
+                Send-BridgeResponse -RequestId $reqId -Success $true -Data @{
+                    success = $true
+                    state = "ready_to_install"
+                    message = "Update download handled by Node process host"
+                }
+            }
+            "updates.cancelDownload" {
+                Send-BridgeResponse -RequestId $reqId -Success $true -Data @{
+                    success = $true
+                    status = "cancelled"
+                }
+            }
+            "updates.install" {
+                Send-BridgeResponse -RequestId $reqId -Success $true -Data @{
+                    success = $true
+                    status = "helper_spawned"
+                    state = "installing"
+                    message = "Update installation handled by Node process host"
                 }
             }
 

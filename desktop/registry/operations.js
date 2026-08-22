@@ -251,6 +251,42 @@ const OPERATIONS = {
     tier: 'local',
     requiresConfirmation: false,
     description: 'Retrieve local installation version and update availability'
+  },
+  'updates.check': {
+    id: 'updates.check',
+    timeoutClass: 'STANDARD_LOCAL',
+    timeoutMs: TIMEOUT_CLASSES.STANDARD_LOCAL,
+    isMutating: false,
+    tier: 'remote',
+    requiresConfirmation: false,
+    description: 'Check remote release endpoint for latest product updates'
+  },
+  'updates.download': {
+    id: 'updates.download',
+    timeoutClass: 'BACKGROUND_LIFECYCLE',
+    timeoutMs: TIMEOUT_CLASSES.BACKGROUND_LIFECYCLE,
+    isMutating: false,
+    tier: 'remote',
+    requiresConfirmation: false,
+    description: 'Download and cryptographically verify available update artifacts'
+  },
+  'updates.cancelDownload': {
+    id: 'updates.cancelDownload',
+    timeoutClass: 'FAST_READ',
+    timeoutMs: TIMEOUT_CLASSES.FAST_READ,
+    isMutating: false,
+    tier: 'local',
+    requiresConfirmation: false,
+    description: 'Cancel any active in-flight update artifact download'
+  },
+  'updates.install': {
+    id: 'updates.install',
+    timeoutClass: 'BACKGROUND_LIFECYCLE',
+    timeoutMs: TIMEOUT_CLASSES.BACKGROUND_LIFECYCLE,
+    isMutating: true,
+    tier: 'local',
+    requiresConfirmation: false,
+    description: 'Prepare handoff and launch detached helper to install verified update'
   }
 };
 

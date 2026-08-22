@@ -32,7 +32,11 @@ const VALID_OPERATIONS = new Set([
   'doctor.run',
   'doctor.repair',
   'activity.list',
-  'updates.status'
+  'updates.status',
+  'updates.check',
+  'updates.download',
+  'updates.cancelDownload',
+  'updates.install'
 ]);
 
 function isValidOperation(op) {
@@ -77,6 +81,27 @@ contextBridge.exposeInMainWorld('nexoraBridge', {
         }
       };
     }
+  },
+
+  /**
+   * Controlled update progress subscription.
+   * Returns an unsubscribe function.
+   * @param {Function} callback Callback receiving sanitized progress events
+   * @returns {Function} Unsubscribe function
+   */
+  onUpdateProgress: (callback) => {
+    if (typeof callback !== 'function') return () => {};
+    const listener = (_event, data) => {
+      try {
+        callback(data);
+      } catch {}
+    };
+    ipcRenderer.on('nexora:update-progress', listener);
+    return () => {
+      try {
+        ipcRenderer.removeListener('nexora:update-progress', listener);
+      } catch {}
+    };
   },
 
   /**

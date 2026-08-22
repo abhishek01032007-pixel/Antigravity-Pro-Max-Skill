@@ -549,7 +549,18 @@ function Get-NexoraApplicationUpdateStatus {
         status          = "Local installation verified"
         message         = "Local v$currentVersion verified. Remote update checks not performed."
         checkedAt       = (Get-Date).ToString("o")
+        state           = "idle"
+        error           = $null
     }
+}
+
+function Invoke-NexoraApplicationUpdateCheck {
+    param(
+        [Parameter(Mandatory=$false)]
+        [string]$Channel = "stable"
+    )
+
+    return (Get-NexoraApplicationUpdateStatus)
 }
 
 function Invoke-NexoraApplicationDoctor {
